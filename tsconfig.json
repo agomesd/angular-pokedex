@@ -42,6 +42,12 @@
       ],
       "@spartan-ng/helm/card": [
         "./libs/ui/card/src/index.ts"
+      ],
+      "@spartan-ng/helm/pagination": [
+        "./libs/ui/pagination/src/index.ts"
+      ],
+      "@spartan-ng/helm/select": [
+        "./libs/ui/select/src/index.ts"
       ]
     }
   },

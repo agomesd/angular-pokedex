@@ -1,7 +1,12 @@
 @if (list(); as data) {
-<ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-  @for (p of data.results; track p.name) {
-  <app-pokemon-item [name]="p.name"></app-pokemon-item>
-  }
-</ul>
+  <hlm-numbered-pagination
+    [(currentPage)]="page"
+    [(itemsPerPage)]="pageSize"
+    [totalItems]="data.count"
+  />
+  <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+    @for (p of data.results; track p.name) {
+      <app-pokemon-item [name]="p.name" />
+    }
+  </ul>
 }
