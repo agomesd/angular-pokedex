@@ -25,16 +25,25 @@ export type PokemonListResponse = {
   count: number;
   next: string | null;
   previous: string | null;
-  results: Pokemon[];
+  results: { name: string; url: string }[];
 };
 
 export type Pokemon = {
+  id: number;
   name: string;
+  height: number;
+  weight: number;
+  abilities: {
+    is_hidden: boolean;
+    ability: { name: string; url: string };
+  }[];
+  stats: {
+    base_stat: number;
+    stat: { name: string };
+  }[];
   types: {
-    type: {
-      name: string;
-      url: string;
-    };
+    slot: number;
+    type: { name: string; url: string };
   }[];
   sprites: {
     front_default: string | null;
