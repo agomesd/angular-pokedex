@@ -3,12 +3,12 @@
     <div class="flex items-center justify-between ">
       <h3 hlmCardTitle>{{ name() | titlecase }}</h3>
       @if (pokemonType(); as type) {
-      @if (
-      type.sprites['generation-viii']['brilliant-diamond-shining-pearl'].symbol_icon;
-      as icon
-      ) {
-      <img [ngSrc]="icon" [alt]="type.name | titlecase" width="32" height="32" class="rounded-full" />
-      }
+      <div class="flex items-center gap-2 border border-gray-200 p-0.5 pl-2 rounded-full">
+        <span [class]="'text-sm font-medium ' + typeColour(type.name)">{{ type.name | titlecase }}</span>
+        @if (typeSymbol(type); as icon) {
+        <img [ngSrc]="icon" [alt]="type.name | titlecase" width="32" height="32" class="rounded-full" />
+        }
+      </div>
       }
     </div>
   </hlm-card-header>

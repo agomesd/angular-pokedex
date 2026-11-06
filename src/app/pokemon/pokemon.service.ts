@@ -42,15 +42,16 @@ export type Pokemon = {
   };
 };
 
+type TypeGameSprites = {
+  name_icon?: string | null;
+  symbol_icon?: string | null;
+};
+
+export type TypeSprites = Record<string, Record<string, TypeGameSprites>>;
+
 export type PokemonType = {
   name: string;
-  sprites: {
-    'generation-viii': {
-      'brilliant-diamond-shining-pearl': {
-        symbol_icon: string | null;
-      };
-    };
-  };
+  sprites: TypeSprites;
 };
 
 type GameSprites = {

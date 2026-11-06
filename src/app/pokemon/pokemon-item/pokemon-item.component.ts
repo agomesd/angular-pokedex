@@ -1,6 +1,8 @@
 import { Component, inject, input, effect, signal } from '@angular/core';
 import { TitleCasePipe, NgOptimizedImage } from '@angular/common';
 import { latestFrontDefault } from '../utils/latest-front-default';
+import { latestSymbolIcon } from '../utils/latest-symbol-icon';
+import { typeColour } from '../utils/type-colour';
 import { Pokemon, PokemonService, PokemonType } from '../pokemon.service';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 
@@ -22,6 +24,12 @@ export class PokemonItem {
       pokemon.sprites.front_default
     );
   }
+
+  protected typeSymbol(type: PokemonType): string | null {
+    return latestSymbolIcon(type.sprites);
+  }
+
+  protected readonly typeColour = typeColour;
 
   constructor() {
     effect((onCleanup) => {
