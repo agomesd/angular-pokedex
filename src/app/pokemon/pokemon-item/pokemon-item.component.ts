@@ -1,5 +1,6 @@
 import { Component, inject, input, effect, signal } from '@angular/core';
 import { TitleCasePipe, NgOptimizedImage } from '@angular/common';
+import { latestFrontDefault } from '../utils/latest-front-default';
 import { Pokemon, PokemonService, PokemonType } from '../pokemon.service';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 
@@ -14,6 +15,13 @@ export class PokemonItem {
 
   readonly pokemon = signal<Pokemon | undefined>(undefined);
   readonly pokemonType = signal<PokemonType | undefined>(undefined);
+
+  protected pokemonSprite(pokemon: Pokemon): string | null {
+    return (
+      latestFrontDefault(pokemon.sprites.versions) ??
+      pokemon.sprites.front_default
+    );
+  }
 
   constructor() {
     effect((onCleanup) => {

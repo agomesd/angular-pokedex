@@ -38,13 +38,7 @@ export type Pokemon = {
   }[];
   sprites: {
     front_default: string | null;
-    versions: {
-      'generation-viii': {
-        'sword-shield': {
-          front_default: string | null;
-        };
-      };
-    };
+    versions: SpriteVersions;
   };
 };
 
@@ -58,3 +52,8 @@ export type PokemonType = {
     };
   };
 };
+
+type GameSprites = {
+  front_default?: string | null;
+};
+export type SpriteVersions = Record<string, Record<string, GameSprites>>;
