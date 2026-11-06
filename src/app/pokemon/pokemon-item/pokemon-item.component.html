@@ -1,0 +1,29 @@
+<hlm-card>
+  <hlm-card-header>
+    <div class="flex items-center justify-between ">
+      <h3 hlmCardTitle>{{ name() | titlecase }}</h3>
+      @if (pokemonType(); as type) {
+        @if (
+          type.sprites['generation-viii']['brilliant-diamond-shining-pearl'].symbol_icon;
+          as icon
+        ) {
+          <img [ngSrc]="icon" [alt]="type.name | titlecase" width="32" height="32" class="rounded-full" />
+        }
+      }
+    </div>
+  </hlm-card-header>
+  <div hlmCardContent>
+    <div class="w-32 h-32 relative bg-indigo-200 rounded-2xl p-2">
+      @if (pokemon(); as p) {
+      @if (
+      p.sprites.versions['generation-viii']['sword-shield'].front_default
+      ?? p.sprites.front_default;
+      as src
+      ) {
+      <img [ngSrc]="src" [alt]="name() | titlecase" fill />
+      }
+      }
+    </div>
+
+  </div>
+</hlm-card>
