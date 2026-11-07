@@ -2,28 +2,10 @@
   <hlm-card-header>
     <div class="flex items-center justify-between ">
       <h3 hlmCardTitle>{{ name() | titlecase }}</h3>
-      <div class="flex h-9 shrink-0 items-center gap-2 rounded-full border border-gray-200 pr-0.5 pl-2">
-        @if (primaryTypeName(); as type) {
-        <span [class]="'text-sm font-medium ' + typeColour(type)">{{ type | titlecase }}</span>
+      <div class="flex shrink-0 items-center gap-1">
+        @for (type of typeBadges(); track type.name) {
+          <app-pokemon-type-badge [name]="type.name" [icon]="type.icon" />
         }
-        <span class="grid size-8 shrink-0 place-items-center">
-          @if (primaryTypeIcon(); as icon) {
-          <img
-            #typeIcon
-            [ngSrc]="icon"
-            alt=""
-            width="32"
-            height="32"
-            class="col-start-1 row-start-1 size-8 rounded-full"
-            [class.opacity-0]="!typeIconReady(icon)"
-            (load)="onTypeIconLoad(icon)"
-            (error)="onTypeIconError(icon)"
-          />
-          }
-          @if (showTypeSpinner()) {
-          <hlm-spinner class="col-start-1 row-start-1" aria-label="Loading type" />
-          }
-        </span>
       </div>
     </div>
   </hlm-card-header>

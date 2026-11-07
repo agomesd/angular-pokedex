@@ -1,4 +1,4 @@
-import { NgOptimizedImage, TitleCasePipe } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideCross, lucideShield, lucideSword, lucideTrash2 } from '@ng-icons/lucide';
@@ -9,13 +9,14 @@ import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { PokemonDetailSheet } from '../../pokemon-detail-sheet/pokemon-detail-sheet.component';
 import { PokemonService, PokemonType } from '../../pokemon.service';
 import { PokemonSprite } from '../../pokemon-sprite/pokemon-sprite.component';
+import { PokemonTypeBadge } from '../../pokemon-type-badge/pokemon-type-badge.component';
 import { latestSymbolIcon } from '../../utils/latest-symbol-icon';
 import { TEAM_ROLE_ICON, TEAM_ROLES, TeamRole, TeamService, TeamSlot } from '../team.service';
 
 @Component({
   selector: 'li[appTeamSlot]',
   templateUrl: './team-slot.component.html',
-  imports: [TitleCasePipe, NgOptimizedImage, RouterLink, PokemonSprite, NgIcon, HlmButton, PokemonDetailSheet, BrnTooltip],
+  imports: [TitleCasePipe, RouterLink, PokemonSprite, NgIcon, HlmButton, PokemonDetailSheet, BrnTooltip, PokemonTypeBadge],
   providers: [
     provideIcons({ lucideTrash2, lucideSword, lucideShield, lucideCross }),
     provideBrnTooltipDefaultOptions({
@@ -44,6 +45,7 @@ export class TeamSlotComponent {
   readonly dragging = input(false);
   readonly dropTarget = input(false);
 
+  private readonly memberId = computed(() => this.member()?.id ?? null);
   private readonly loadedTypes = signal<PokemonType[]>([]);
   protected readonly typeIcons = computed(() =>
     this.loadedTypes().flatMap((type) => {
@@ -103,12 +105,12 @@ export class TeamSlotComponent {
     });
 
     effect((onCleanup) => {
-      const member = this.member();
+      const id = this.memberId();
       this.loadedTypes.set([]);
-      if (!member) return;
+      if (id == null) return;
 
       const request = this.pokemonService
-        .getPokemon(String(member.id))
+        .getPokemon(String(id))
         .pipe(
           switchMap((pokemon) => {
             const urls = pokemon.types.map((entry) => entry.type.url);

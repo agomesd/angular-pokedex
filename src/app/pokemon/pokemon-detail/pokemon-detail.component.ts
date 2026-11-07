@@ -1,4 +1,4 @@
-import { DecimalPipe, isPlatformBrowser, NgOptimizedImage, TitleCasePipe } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser, TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, PLATFORM_ID, signal, viewChild } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -8,6 +8,7 @@ import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmSwitch } from '@spartan-ng/helm/switch';
 import { catchError, forkJoin, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { PokemonSprite } from '../pokemon-sprite/pokemon-sprite.component';
+import { PokemonTypeBadge } from '../pokemon-type-badge/pokemon-type-badge.component';
 import { AddToTeam } from '../team/add-to-team/add-to-team.component';
 import { Pokemon, PokemonService, PokemonSpecies, PokemonType } from '../pokemon.service';
 import { TEAM_LIMIT, TeamService } from '../team/team.service';
@@ -51,7 +52,7 @@ type PokemonDetailState =
 @Component({
   selector: 'app-pokemon-detail',
   templateUrl: './pokemon-detail.component.html',
-  imports: [RouterLink, TitleCasePipe, DecimalPipe, NgOptimizedImage, HlmButton, HlmSwitch, NgIcon, PokemonSprite, AddToTeam],
+  imports: [RouterLink, TitleCasePipe, DecimalPipe, HlmButton, HlmSwitch, NgIcon, PokemonSprite, AddToTeam, PokemonTypeBadge],
   providers: [provideIcons({ lucideVolume2 })],
 })
 export class PokemonDetail {

@@ -8,13 +8,18 @@ export class PokemonService {
   private http = inject(HttpClient);
   private baseUrl = 'https://pokeapi.co/api/v2';
   private directory$: Observable<PokemonListEntry[]> | null = null;
+  private readonly pokemonByKey = new Map<string, Observable<Pokemon>>();
+  private readonly typeByUrl = new Map<string, Observable<PokemonType>>();
 
   getPokemon(name: string) {
-    return this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${name}`);
+    const key = name.trim().toLowerCase();
+    return this.cached(this.pokemonByKey, key, () =>
+      this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${key}`),
+    );
   }
 
   getType(typeUrl: string) {
-    return this.http.get<PokemonType>(`${typeUrl}`);
+    return this.cached(this.typeByUrl, typeUrl, () => this.http.get<PokemonType>(typeUrl));
   }
 
   getSpecies(speciesUrl: string) {
@@ -35,6 +40,21 @@ export class PokemonService {
         return throwError(() => error);
       }),
     );
+  }
+
+  private cached<T>(cache: Map<string, Observable<T>>, key: string, request: () => Observable<T>): Observable<T> {
+    const existing = cache.get(key);
+    if (existing) return existing;
+
+    const shared = request().pipe(
+      catchError((error: unknown) => {
+        cache.delete(key);
+        return throwError(() => error);
+      }),
+      shareReplay({ bufferSize: 1, refCount: false }),
+    );
+    cache.set(key, shared);
+    return shared;
   }
 
   private fetchDirectory(count: number | null): Observable<PokemonListEntry[]> {

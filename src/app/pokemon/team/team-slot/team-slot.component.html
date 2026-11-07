@@ -7,15 +7,13 @@
 </span>
 @if (member(); as member) {
   @if (typeIcons().length) {
-    <div class="pointer-events-none absolute bottom-2 left-3 z-10 flex items-center gap-1">
+    <div
+      class="absolute bottom-2 left-3 z-10 flex items-center gap-1"
+      (pointerdown)="$event.stopPropagation()"
+      (dragstart)="$event.preventDefault(); $event.stopPropagation()"
+    >
       @for (type of typeIcons(); track type.name) {
-        <img
-          [ngSrc]="type.icon"
-          [alt]="type.name | titlecase"
-          width="24"
-          height="24"
-          class="size-6 rounded-full bg-white/70 sm:size-7"
-        />
+        <app-pokemon-type-badge [name]="type.name" [icon]="type.icon" size="sm" position="top" />
       }
     </div>
   }

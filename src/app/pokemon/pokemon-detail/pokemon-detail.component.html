@@ -167,14 +167,9 @@
 
       <div class="flex flex-wrap gap-2">
         @for (entry of detail.pokemon.types; track entry.slot) {
-        <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 py-0.5 pr-0.5 pl-2">
-          <span [class]="'text-sm font-medium ' + typeColour(entry.type.name)">
-            {{ entry.type.name | titlecase }}
-          </span>
           @if (typeIcon(detail.types, entry.type.name); as icon) {
-          <img [ngSrc]="icon" alt="" width="24" height="24" class="rounded-full" />
+            <app-pokemon-type-badge [name]="entry.type.name" [icon]="icon" size="sm" />
           }
-        </span>
         }
       </div>
 

@@ -1,4 +1,4 @@
-import { NgOptimizedImage, TitleCasePipe } from '@angular/common';
+import { TitleCasePipe } from '@angular/common';
 import { Component, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
@@ -9,7 +9,7 @@ import { Pokemon, PokemonService, PokemonType } from '../pokemon.service';
 import { AddToTeam } from '../team/add-to-team/add-to-team.component';
 import { latestFrontDefault } from '../utils/latest-front-default';
 import { latestSymbolIcon } from '../utils/latest-symbol-icon';
-import { typeColour } from '../utils/type-colour';
+import { PokemonTypeBadge } from '../pokemon-type-badge/pokemon-type-badge.component';
 
 const STAT_LABELS: Record<string, string> = {
   hp: 'HP',
@@ -23,7 +23,7 @@ const STAT_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-pokemon-details',
   templateUrl: './pokemon-details.component.html',
-  imports: [HlmSheetImports, TitleCasePipe, NgOptimizedImage, PokemonSprite, RouterLink, HlmButton, AddToTeam],
+  imports: [HlmSheetImports, TitleCasePipe, PokemonSprite, RouterLink, HlmButton, AddToTeam, PokemonTypeBadge],
 })
 export class PokemonDetails {
   private readonly pokemonService = inject(PokemonService);
@@ -32,8 +32,6 @@ export class PokemonDetails {
   readonly types = input<PokemonType[]>();
 
   private readonly loadedTypes = signal<PokemonType[]>([]);
-
-  protected readonly typeColour = typeColour;
 
   protected displayTypes(): PokemonType[] {
     return this.types() ?? this.loadedTypes();

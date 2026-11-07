@@ -1,0 +1,16 @@
+<span
+  class="inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full"
+  [class]="badgeClass()"
+  tabindex="0"
+  [brnTooltip]="label() | titlecase"
+  [position]="position()"
+  [attr.aria-label]="label() | titlecase"
+>
+  <img
+    [ngSrc]="icon()"
+    alt=""
+    [width]="dimension()"
+    [height]="dimension()"
+    class="size-full rounded-full"
+  />
+</span>
