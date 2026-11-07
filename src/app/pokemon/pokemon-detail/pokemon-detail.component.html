@@ -65,9 +65,24 @@
             <ng-icon name="lucideVolume2" />
           </button>
           }
-          <button hlmBtn type="button" variant="outline" class="cursor-pointer rounded-xl">Add to team</button>
+          <button
+            hlmBtn
+            type="button"
+            variant="outline"
+            class="cursor-pointer rounded-xl"
+            [disabled]="teamFull()"
+            [attr.aria-pressed]="onTeam()"
+            (click)="toggleTeam(detail.pokemon)"
+          >
+            {{ onTeam() ? 'Remove from team' : 'Add to team' }}
+          </button>
         </div>
       </div>
+      @if (teamFull()) {
+        <p role="status" class="text-muted-foreground text-sm">
+          Your team already has {{ teamLimit }} Pokémon. Remove one before adding another.
+        </p>
+      }
       <p class="text-muted-foreground text-sm">{{ portrait()?.caption }}</p>
 
       <div class="flex flex-col gap-2">

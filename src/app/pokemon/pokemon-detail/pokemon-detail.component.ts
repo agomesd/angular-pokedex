@@ -9,6 +9,8 @@ import { HlmSwitch } from '@spartan-ng/helm/switch';
 import { catchError, forkJoin, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { PokemonSprite } from '../pokemon-sprite/pokemon-sprite.component';
 import { Pokemon, PokemonService, PokemonSpecies, PokemonType } from '../pokemon.service';
+import { TEAM_LIMIT, TeamService } from '../team/team.service';
+import { latestFrontDefault } from '../utils/latest-front-default';
 import { isPokemonNotFound } from '../utils/is-pokemon-not-found';
 import { latestSymbolIcon } from '../utils/latest-symbol-icon';
 import { normalizeSearch } from '../utils/normalize-search';
@@ -55,6 +57,7 @@ export class PokemonDetail {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly pokemonService = inject(PokemonService);
+  private readonly team = inject(TeamService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly reload = signal(0);
   private readonly cry = viewChild<ElementRef<HTMLAudioElement>>('cry');
@@ -145,6 +148,13 @@ export class PokemonDetail {
 
   protected readonly entry = computed(() => pokedexEntry(this.found()?.species ?? null, this.gameId()));
 
+  protected readonly teamLimit = TEAM_LIMIT;
+  protected readonly onTeam = computed(() => {
+    const id = this.found()?.pokemon.id;
+    return id !== undefined && this.team.has(id);
+  });
+  protected readonly teamFull = computed(() => !this.onTeam() && this.team.members().length >= TEAM_LIMIT);
+
   protected readonly typeColour = typeColour;
   protected readonly generationLabel = generationLabel;
   protected readonly genderLabel = genderLabel;
@@ -188,6 +198,19 @@ export class PokemonDetail {
 
   protected showGame(game: GameView): void {
     this.gameId.set(game.id);
+  }
+
+  protected toggleTeam(pokemon: Pokemon): void {
+    if (this.team.has(pokemon.id)) {
+      this.team.remove(pokemon.id);
+      return;
+    }
+
+    this.team.add({
+      id: pokemon.id,
+      name: pokemon.name,
+      sprite: latestFrontDefault(pokemon.sprites.versions) ?? pokemon.sprites.front_default,
+    });
   }
 
   protected playCry(): void {

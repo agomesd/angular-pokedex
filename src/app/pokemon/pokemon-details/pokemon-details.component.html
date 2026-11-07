@@ -6,51 +6,17 @@
   <div class="flex flex-wrap gap-2">
     <a hlmBtn variant="outline" class="cursor-pointer" [routerLink]="['/pokemon', pokemon().id]">View page</a>
     @if (onTeam()) {
-      <button hlmBtn type="button" disabled>On team</button>
+      <button hlmBtn type="button" class="cursor-pointer" (click)="toggleTeam()">Remove from team</button>
     } @else {
-      <button hlmBtn type="button" class="cursor-pointer" [disabled]="teamFull()" (click)="openAddForm()">
+      <button hlmBtn type="button" class="cursor-pointer" [disabled]="teamFull()" (click)="toggleTeam()">
         Add to team
       </button>
     }
   </div>
   @if (teamFull()) {
     <p role="status" class="text-muted-foreground text-sm">
-      Your team already has 6 Pokémon. Remove one before adding another.
+      Your team already has {{ teamLimit }} Pokémon. Remove one before adding another.
     </p>
-  }
-  @if (showAddForm() && !onTeam()) {
-    <form class="flex flex-col gap-3" (submit)="submitAdd(); $event.preventDefault()">
-      <label class="flex flex-col gap-1 text-sm" [attr.for]="'team-nickname-' + pokemon().id">
-        Nickname
-        <input
-          [id]="'team-nickname-' + pokemon().id"
-          class="border-input bg-background h-7 rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          [value]="nickname()"
-          (input)="nickname.set($any($event.target).value)"
-          maxlength="12"
-          required
-        />
-      </label>
-      <label class="flex flex-col gap-1 text-sm" [attr.for]="'team-role-' + pokemon().id">
-        Role
-        <select
-          [id]="'team-role-' + pokemon().id"
-          class="border-input bg-background h-7 cursor-pointer rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          [value]="role()"
-          (change)="role.set($any($event.target).value)"
-          required
-        >
-          <option value="" disabled>Choose a role</option>
-          @for (option of roles; track option) {
-            <option [value]="option">{{ option }}</option>
-          }
-        </select>
-      </label>
-      @if (addError(); as error) {
-        <p role="alert" class="text-destructive text-sm">{{ error }}</p>
-      }
-      <button hlmBtn type="submit" class="cursor-pointer w-fit">Save to team</button>
-    </form>
   }
 
   <div class="relative h-40 w-40 rounded-2xl bg-indigo-200 p-2">
