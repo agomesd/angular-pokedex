@@ -1,4 +1,6 @@
 import { Component, DestroyRef, computed, inject, input, output, signal, viewChild } from '@angular/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideSearch } from '@ng-icons/lucide';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { BrnSheetContent } from '@spartan-ng/brain/sheet';
@@ -31,11 +33,13 @@ type RangeCheck = {
   imports: [
     ReactiveFormsModule,
     HlmButton,
+    NgIcon,
     HlmSheetImports,
     BrnSheetContent,
     PokemonDetails,
     HlmSpinner,
   ],
+  providers: [provideIcons({ lucideSearch })],
 })
 export class PokemonSearchComponent {
   private readonly pokemonService = inject(PokemonService);
