@@ -1,0 +1,114 @@
+<div class="flex shrink-0 items-center rounded-full bg-primary p-2">
+  <button hlmBtn type="button" variant="outline" class="relative size-14 rounded-full"
+    style="--ng-icon__size: 1.5rem; --ng-icon__stroke-width: 2.5" aria-label="Filter Pokémon"
+    [attr.aria-pressed]="filtersActive()" (click)="open()">
+    <ng-icon name="lucideFunnel" class="text-white [&_path]:fill-none [&_path]:stroke-white" />
+    @if (filtersActive()) {
+    <span class="bg-primary absolute top-2 right-2 size-2.5 rounded-full ring-2 ring-background"></span>
+    }
+  </button>
+</div>
+
+<hlm-sheet side="right">
+  <ng-template brnSheetContent>
+    <hlm-sheet-content class="overflow-y-auto sm:max-w-md">
+      <div hlmSheetHeader class="flex-row items-center justify-between pe-14">
+        <h2 hlmSheetTitle class="text-base">Filters</h2>
+        <button hlmBtn type="button" variant="outline" size="sm" [disabled]="!filtersActive()" (click)="clearAll()">
+          Clear all filters
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-6 px-6 pb-6">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="flex min-w-0 flex-col gap-1.5">
+            <label class="text-sm font-medium" for="pokemon-filter-legendary">Legendary</label>
+            <hlm-select class="block w-full" [value]="selection().legendary" [itemToString]="legendaryLabel"
+              (valueChange)="setLegendary($event)">
+              <hlm-select-trigger buttonId="pokemon-filter-legendary" class="w-full data-[size=default]:h-9">
+                <hlm-select-value />
+              </hlm-select-trigger>
+              <ng-template hlmSelectPortal>
+                <hlm-select-content>
+                  @for (option of legendaryOptions; track option.value) {
+                  <hlm-select-item [value]="option.value">{{ option.label }}</hlm-select-item>
+                  }
+                </hlm-select-content>
+              </ng-template>
+            </hlm-select>
+          </div>
+          <div class="flex min-w-0 flex-col gap-1.5">
+            <label class="text-sm font-medium" for="pokemon-filter-team">Team</label>
+            <hlm-select class="block w-full" [value]="selection().team" [itemToString]="teamLabel"
+              (valueChange)="setTeam($event)">
+              <hlm-select-trigger buttonId="pokemon-filter-team" class="w-full data-[size=default]:h-9">
+                <hlm-select-value />
+              </hlm-select-trigger>
+              <ng-template hlmSelectPortal>
+                <hlm-select-content>
+                  @for (option of teamOptions; track option.value) {
+                  <hlm-select-item [value]="option.value">{{ option.label }}</hlm-select-item>
+                  }
+                </hlm-select-content>
+              </ng-template>
+            </hlm-select>
+          </div>
+        </div>
+
+        <section class="flex flex-col gap-3" aria-labelledby="pokemon-filter-types">
+          <div class="flex items-center justify-between gap-2">
+            <h3 id="pokemon-filter-types" class="text-sm font-medium">Types</h3>
+            <button hlmBtn type="button" variant="outline" size="sm" [disabled]="!hasTypes()" (click)="clearTypes()">
+              Clear types
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            @for (type of typeOptions; track type) {
+            <div class="flex flex-col items-center gap-1.5">
+              <brn-switch
+                class="focus-visible:ring-ring inline-flex h-10 w-[4.5rem] shrink-0 cursor-pointer items-center rounded-full bg-input p-1 transition-colors outline-none focus-visible:ring-2"
+                [class]="typeCheckedTrack(type)" [checked]="typeSelected(type)" [aria-label]="type | titlecase"
+                (checkedChange)="setType(type, $event)">
+                <span brnSwitchThumb
+                  class="block size-8 cursor-pointer overflow-hidden rounded-full transition-transform data-unchecked:translate-x-0 data-checked:translate-x-8">
+                  @if (typeIcons()[type]; as icon) {
+                  <img [src]="icon" alt="" class="size-full rounded-full object-cover" />
+                  }
+                </span>
+              </brn-switch>
+              <span class="text-center text-xs leading-tight">{{ type | titlecase }}</span>
+            </div>
+            }
+          </div>
+        </section>
+
+        <section class="flex flex-col gap-3" aria-labelledby="pokemon-filter-generations">
+          <div class="flex items-center justify-between gap-2">
+            <h3 id="pokemon-filter-generations" class="text-sm font-medium">Generations</h3>
+            <button hlmBtn type="button" variant="outline" size="sm" [disabled]="!hasGenerations()"
+              (click)="clearGenerations()">
+              Clear generations
+            </button>
+          </div>
+          <div class="grid grid-cols-3 gap-3">
+            @for (generation of generationOptions; track generation) {
+            <div class="flex flex-col items-center gap-1.5">
+              <brn-switch
+                class="focus-visible:ring-ring data-checked:bg-primary inline-flex h-10 w-[4.5rem] shrink-0 cursor-pointer items-center rounded-full bg-input p-1 transition-colors outline-none focus-visible:ring-2"
+                [checked]="generationSelected(generation)" [aria-label]="generationName(generation)"
+                (checkedChange)="setGeneration(generation, $event)">
+                <span brnSwitchThumb
+                  class="bg-background text-foreground grid size-8 cursor-pointer place-items-center rounded-full text-[0.625rem] font-bold tracking-tighter transition-transform data-unchecked:translate-x-0 data-checked:translate-x-8">
+                  {{ generationNumeral(generation) }}
+                </span>
+              </brn-switch>
+              <span class="text-center text-xs leading-tight">{{ generationName(generation) }}</span>
+            </div>
+            }
+          </div>
+        </section>
+
+      </div>
+    </hlm-sheet-content>
+  </ng-template>
+</hlm-sheet>

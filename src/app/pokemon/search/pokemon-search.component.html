@@ -1,34 +1,17 @@
 <form class="flex min-w-0 flex-col gap-2" (submit)="submit($event)"
   [attr.aria-busy]="sheetState().status === 'searching'">
-  <div class="flex min-w-0 items-center gap-2 rounded-full bg-red-500 px-4 py-2">
+  <div class="flex min-w-0 items-center gap-2 rounded-full bg-primary p-2">
     <div class="flex min-w-0 flex-1 flex-col gap-1">
-      <input
-        id="pokemon-search"
-        type="search"
+      <input id="pokemon-search" type="search"
         class="border-input bg-background h-14 w-full rounded-full border px-4 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        placeholder="Search Pokémon by name or ID"
-        autocomplete="off"
-        autocapitalize="none"
-        spellcheck="false"
-        [formControl]="query"
-        [attr.aria-invalid]="rangeError() ? true : null"
-        [attr.aria-describedby]="rangeError() ? 'pokemon-search-error' : null"
-      />
+        placeholder="Search Pokémon by name or ID" autocomplete="off" autocapitalize="none" spellcheck="false"
+        [formControl]="query" [attr.aria-invalid]="rangeError() ? true : null"
+        [attr.aria-describedby]="rangeError() ? 'pokemon-search-error' : null" />
     </div>
-    <button
-      hlmBtn
-      type="submit"
-      variant="outline"
-      size="icon-lg"
-      class="size-14 shrink-0 rounded-full"
-      style="--ng-icon__size: 2rem; --ng-icon__stroke-width: 2.5"
-      aria-label="Search"
-      [disabled]="searchDisabled()"
-    >
-      <ng-icon
-        name="lucideSearch"
-        class="text-white [&_path]:fill-none [&_path]:stroke-white [&_circle]:stroke-white"
-      />
+    <button hlmBtn type="submit" variant="outline" size="icon-lg" class="size-14 shrink-0 rounded-full"
+      style="--ng-icon__size: 2rem; --ng-icon__stroke-width: 2.5" aria-label="Search" [disabled]="searchDisabled()">
+      <ng-icon name="lucideSearch"
+        class="text-white [&_path]:fill-none [&_path]:stroke-white [&_circle]:stroke-white" />
     </button>
   </div>
   @if (rangeError(); as message) {

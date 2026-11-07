@@ -1,13 +1,17 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { Observable, catchError, map, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, shareReplay, switchMap, throwError } from 'rxjs';
 import { PokemonListEntry, pokemonListDirectory } from './utils/pokemon-directory';
+import { parsePokemonFilterCatalog, type PokemonFilterCatalog } from './utils/pokemon-filters';
+
+const POKEAPI_CSV = 'https://cdn.jsdelivr.net/gh/PokeAPI/pokeapi@master/data/v2/csv';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
   private http = inject(HttpClient);
   private baseUrl = 'https://pokeapi.co/api/v2';
   private directory$: Observable<PokemonListEntry[]> | null = null;
+  private catalog$: Observable<PokemonFilterCatalog> | null = null;
   private readonly pokemonByKey = new Map<string, Observable<Pokemon>>();
   private readonly typeByUrl = new Map<string, Observable<PokemonType>>();
 
@@ -20,6 +24,10 @@ export class PokemonService {
 
   getType(typeUrl: string) {
     return this.cached(this.typeByUrl, typeUrl, () => this.http.get<PokemonType>(typeUrl));
+  }
+
+  getTypeByName(name: string) {
+    return this.getType(`${this.baseUrl}/type/${name.trim().toLowerCase()}`);
   }
 
   getSpecies(speciesUrl: string) {
@@ -37,6 +45,25 @@ export class PokemonService {
     return this.directory$.pipe(
       catchError((error: unknown) => {
         this.directory$ = null;
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  // One cached read of species, forms, and types. PokéAPI has no bulk legendary endpoint.
+  filterCatalog(): Observable<PokemonFilterCatalog> {
+    this.catalog$ ??= forkJoin({
+      species: this.http.get(`${POKEAPI_CSV}/pokemon_species.csv`, { responseType: 'text' }),
+      pokemon: this.http.get(`${POKEAPI_CSV}/pokemon.csv`, { responseType: 'text' }),
+      types: this.http.get(`${POKEAPI_CSV}/types.csv`, { responseType: 'text' }),
+      pokemonTypes: this.http.get(`${POKEAPI_CSV}/pokemon_types.csv`, { responseType: 'text' }),
+    }).pipe(
+      map((files) => parsePokemonFilterCatalog(files)),
+      shareReplay(1),
+    );
+    return this.catalog$.pipe(
+      catchError((error: unknown) => {
+        this.catalog$ = null;
         return throwError(() => error);
       }),
     );

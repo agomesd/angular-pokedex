@@ -50,6 +50,34 @@ export function typeColour(name: string): string {
   return TYPE_COLOURS[name] ?? 'text-gray-500';
 }
 
+const TYPE_CHECKED_TRACKS: Record<string, string> = {
+  normal: 'data-checked:bg-gray-500',
+  fighting: 'data-checked:bg-red-500',
+  flying: 'data-checked:bg-sky-500',
+  poison: 'data-checked:bg-purple-500',
+  ground: 'data-checked:bg-amber-500',
+  rock: 'data-checked:bg-yellow-600',
+  bug: 'data-checked:bg-lime-600',
+  ghost: 'data-checked:bg-violet-500',
+  steel: 'data-checked:bg-slate-500',
+  fire: 'data-checked:bg-orange-500',
+  water: 'data-checked:bg-blue-500',
+  grass: 'data-checked:bg-green-500',
+  electric: 'data-checked:bg-yellow-500',
+  psychic: 'data-checked:bg-pink-500',
+  ice: 'data-checked:bg-cyan-500',
+  dragon: 'data-checked:bg-indigo-500',
+  dark: 'data-checked:bg-stone-700',
+  fairy: 'data-checked:bg-pink-400',
+  stellar: 'data-checked:bg-teal-500',
+  unknown: 'data-checked:bg-gray-400',
+  shadow: 'data-checked:bg-zinc-700',
+};
+
 export function typeBackground(name: string): string {
   return TYPE_BACKGROUNDS[name] ?? 'bg-gray-500';
+}
+
+export function typeCheckedTrack(name: string): string {
+  return TYPE_CHECKED_TRACKS[name] ?? 'data-checked:bg-gray-500';
 }

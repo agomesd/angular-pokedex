@@ -1,18 +1,26 @@
 <div class="flex flex-wrap items-end gap-3 p-4">
   <div class="min-w-56 flex-1">
-    <app-pokemon-search [totalPokemon]="list()?.count ?? null" (listIndex)="showPokemon($event)" />
+    <app-pokemon-search [totalPokemon]="listCount()" (listIndex)="showPokemon($event)" />
   </div>
-  <app-pokemon-pagination
-    [page]="page()"
-    [hasNext]="list()?.next != null"
-    [lastPage]="lastPage()"
-    (pageChange)="page.set($event)"
-  />
+  <app-pokemon-pagination [page]="page()" [hasNext]="hasNext()" [lastPage]="lastPage()"
+    (pageChange)="page.set($event)" />
+  <app-pokemon-filters [selection]="filters()" (filtersChange)="applyFilters($event)" />
 </div>
-@if (list(); as data) {
-  <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-    @for (p of data.results; track p.name) {
-      <app-pokemon-item [name]="p.name" />
-    }
-  </ul>
+@if (view(); as current) {
+@if (current.status === 'loading' && filtersActive()) {
+<p role="status" class="text-muted-foreground px-4 pb-4 text-sm">Filtering Pokémon…</p>
+} @else if (current.status === 'error') {
+<p role="alert" class="flex flex-wrap items-center gap-3 px-4 pb-4 text-sm">
+  <span class="text-destructive">Filters could not be loaded. Check your connection and try again.</span>
+  <button hlmBtn type="button" variant="outline" size="sm" (click)="retryFilters()">Try again</button>
+</p>
+} @else if (current.status === 'ready' && current.empty) {
+<p role="status" class="text-muted-foreground px-4 pb-4 text-sm">No Pokémon match these filters.</p>
+} @else if (current.status === 'ready') {
+<ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+  @for (p of current.results; track p.name) {
+  <app-pokemon-item [name]="p.name" />
+  }
+</ul>
+}
 }
