@@ -1,0 +1,21 @@
+@for (src of [src()]; track src) {
+  <img
+    #sprite
+    [ngSrc]="src"
+    [alt]="loaded(src) ? alt() : ''"
+    [priority]="priority()"
+    [style.image-rendering]="pixelated() ? 'pixelated' : 'auto'"
+    fill
+    [class.opacity-0]="!loaded(src)"
+    [class.text-transparent]="!loaded(src)"
+    (load)="onLoad(src, $event)"
+    (error)="onError(src)"
+  />
+}
+@if (!loaded(src())) {
+  <app-pokeball-spinner
+    class="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+    [size]="spinnerSize()"
+    [spinning]="!failed(src())"
+  />
+}

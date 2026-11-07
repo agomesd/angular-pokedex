@@ -14,6 +14,10 @@ export class PokemonService {
     return this.http.get<PokemonType>(`${typeUrl}`);
   }
 
+  getSpecies(speciesUrl: string) {
+    return this.http.get<PokemonSpecies>(speciesUrl);
+  }
+
   list(limit = 20, offset = 0) {
     return this.http.get<PokemonListResponse>(`${this.baseUrl}/pokemon`, {
       params: { limit, offset },
@@ -33,22 +37,56 @@ export type Pokemon = {
   name: string;
   height: number;
   weight: number;
+  base_experience: number;
   abilities: {
     is_hidden: boolean;
     ability: { name: string; url: string };
   }[];
   stats: {
     base_stat: number;
+    effort: number;
     stat: { name: string };
   }[];
   types: {
     slot: number;
     type: { name: string; url: string };
   }[];
-  sprites: {
-    front_default: string | null;
-    versions: SpriteVersions;
+  species: { name: string; url: string };
+  cries?: { latest?: string | null; legacy?: string | null };
+  held_items?: { item: { name: string } }[];
+  sprites: PokemonSprites;
+};
+
+export type PokemonSprites = {
+  front_default: string | null;
+  front_shiny?: string | null;
+  back_default?: string | null;
+  back_shiny?: string | null;
+  other?: {
+    home?: SpriteFrame;
+    'official-artwork'?: SpriteFrame;
   };
+  versions: SpriteVersions;
+};
+
+export type PokemonSpecies = {
+  gender_rate: number;
+  capture_rate: number;
+  base_happiness: number;
+  hatch_counter: number;
+  is_baby: boolean;
+  is_legendary: boolean;
+  is_mythical: boolean;
+  growth_rate: { name: string } | null;
+  egg_groups: { name: string }[];
+  habitat: { name: string } | null;
+  generation: { name: string };
+  flavor_text_entries: {
+    flavor_text: string;
+    language: { name: string };
+    version: { name: string };
+  }[];
+  genera: { genus: string; language: { name: string } }[];
 };
 
 type TypeGameSprites = {
@@ -63,7 +101,18 @@ export type PokemonType = {
   sprites: TypeSprites;
 };
 
-type GameSprites = {
+export type SpriteFrame = {
   front_default?: string | null;
+  front_shiny?: string | null;
+  back_default?: string | null;
+  back_shiny?: string | null;
+  front_gray?: string | null;
+  back_gray?: string | null;
 };
+
+export type GameSprites = SpriteFrame & {
+  animated?: SpriteFrame | null;
+  icons?: SpriteFrame | null;
+};
+
 export type SpriteVersions = Record<string, Record<string, GameSprites>>;

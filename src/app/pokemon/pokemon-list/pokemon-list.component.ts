@@ -4,11 +4,12 @@ import { HlmNumberedPagination } from '@spartan-ng/helm/pagination';
 import { switchMap } from 'rxjs';
 import { PokemonItem } from '../pokemon-item/pokemon-item.component';
 import { PokemonService } from '../pokemon.service';
+import { PokemonSearchComponent } from '../search/pokemon-search.component';
 
 @Component({
   selector: 'app-pokemon-list',
   templateUrl: './pokemon-list.html',
-  imports: [PokemonItem, HlmNumberedPagination],
+  imports: [PokemonItem, HlmNumberedPagination, PokemonSearchComponent],
 })
 export class PokemonList {
   private pokemonService = inject(PokemonService);

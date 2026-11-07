@@ -1,0 +1,10 @@
+<img
+  src="/pokeball.png"
+  alt=""
+  [width]="size() === 'lg' ? 128 : 48"
+  [height]="size() === 'lg' ? 128 : 48"
+  class="motion-reduce:animate-none"
+  [class.size-32]="size() === 'lg'"
+  [class.size-12]="size() === 'md'"
+  [class.animate-spin]="spinning()"
+/>
