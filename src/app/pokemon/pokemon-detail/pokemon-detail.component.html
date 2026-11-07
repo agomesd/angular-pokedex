@@ -10,7 +10,7 @@
       disabled>Previous Pokémon</button>
     }
     <a hlmBtn variant="outline" class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal"
-      routerLink="/pokemon">Back to All</a>
+      routerLink="/pokemon" [queryParams]="backToAllQuery()">Back to All</a>
     @if (nextId(); as id) {
     <a hlmBtn variant="outline" class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal"
       [routerLink]="['/pokemon', id]">

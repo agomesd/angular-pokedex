@@ -1,4 +1,4 @@
-<app-pokemon-search />
+<app-pokemon-search [totalPokemon]="list()?.count ?? null" (listIndex)="showPokemon($event)" />
 @if (list(); as data) {
   <hlm-numbered-pagination
     [(currentPage)]="page"

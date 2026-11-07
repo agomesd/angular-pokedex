@@ -1,22 +1,29 @@
 <form
-  class="flex flex-col gap-2 p-4 sm:flex-row sm:items-end"
+  class="flex flex-col gap-2 p-4"
   (submit)="submit($event)"
   [attr.aria-busy]="sheetState().status === 'searching'"
 >
-  <div class="flex min-w-0 flex-1 flex-col gap-1">
-    <label for="pokemon-search" class="text-sm font-medium">Search Pokémon</label>
-    <input
-      id="pokemon-search"
-      type="search"
-      class="border-input bg-background h-7 w-full rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      placeholder="Exact name or ID"
-      autocomplete="off"
-      autocapitalize="none"
-      spellcheck="false"
-      [formControl]="query"
-    />
+  <div class="flex flex-col gap-2 sm:flex-row sm:items-end">
+    <div class="flex min-w-0 flex-1 flex-col gap-1">
+      <label for="pokemon-search" class="text-sm font-medium">Search Pokémon</label>
+      <input
+        id="pokemon-search"
+        type="search"
+        class="border-input bg-background h-7 w-full rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        placeholder="Exact name or ID"
+        autocomplete="off"
+        autocapitalize="none"
+        spellcheck="false"
+        [formControl]="query"
+        [attr.aria-invalid]="rangeError() ? true : null"
+        [attr.aria-describedby]="rangeError() ? 'pokemon-search-error' : null"
+      />
+    </div>
+    <button hlmBtn type="submit" class="w-full sm:w-auto" [disabled]="searchDisabled()">Search</button>
   </div>
-  <button hlmBtn type="submit" class="w-full sm:w-auto" [disabled]="searchDisabled()">Search</button>
+  @if (rangeError(); as message) {
+    <p id="pokemon-search-error" role="alert" class="text-destructive text-sm">{{ message }}</p>
+  }
 </form>
 
 <hlm-sheet side="right">

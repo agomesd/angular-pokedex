@@ -1,10 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { Observable, catchError, map, of, shareReplay, switchMap, throwError } from 'rxjs';
+import { PokemonListEntry, pokemonListDirectory } from './utils/pokemon-directory';
 
 @Injectable({ providedIn: 'root' })
 export class PokemonService {
   private http = inject(HttpClient);
   private baseUrl = 'https://pokeapi.co/api/v2';
+  private directory$: Observable<PokemonListEntry[]> | null = null;
 
   getPokemon(name: string) {
     return this.http.get<Pokemon>(`${this.baseUrl}/pokemon/${name}`);
@@ -22,6 +25,24 @@ export class PokemonService {
     return this.http.get<PokemonListResponse>(`${this.baseUrl}/pokemon`, {
       params: { limit, offset },
     });
+  }
+
+  directory(count: number | null = null): Observable<PokemonListEntry[]> {
+    this.directory$ ??= this.fetchDirectory(count).pipe(shareReplay(1));
+    return this.directory$.pipe(
+      catchError((error: unknown) => {
+        this.directory$ = null;
+        return throwError(() => error);
+      }),
+    );
+  }
+
+  private fetchDirectory(count: number | null): Observable<PokemonListEntry[]> {
+    const page = count && count > 0 ? of(count) : this.list(1, 0).pipe(map((response) => response.count));
+    return page.pipe(
+      switchMap((total) => this.list(total, 0)),
+      map((response) => pokemonListDirectory(response.results)),
+    );
   }
 }
 

@@ -16,6 +16,7 @@ import { generationLabel } from '../utils/generation-order';
 import { englishGenus, genderLabel, hatchSteps, pokedexEntry } from '../utils/species-summary';
 import { artworkFrames, GameView, generationViews, GenerationView } from '../utils/sprite-gallery';
 import { typeColour } from '../utils/type-colour';
+import { pokemonListPage } from '../utils/list-page';
 
 function pokemonPageId(value: string): number | null {
   if (!/^\d+$/.test(value)) return null;
@@ -88,6 +89,13 @@ export class PokemonDetail {
   protected readonly nextId = computed(() => {
     const id = this.pageId();
     return id === null ? null : id + 1;
+  });
+
+  protected readonly backToAllQuery = computed(() => {
+    const id = this.pageId();
+    if (id === null) return {};
+    const page = pokemonListPage(id);
+    return page > 1 ? { page } : {};
   });
 
   private readonly found = computed(() => {
