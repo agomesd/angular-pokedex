@@ -3,21 +3,18 @@
   <p hlmSheetDescription>#{{ pokemon().id }}</p>
 </div>
 <div class="flex flex-col gap-5 px-6 pb-6">
-  <div class="flex flex-wrap gap-2">
-    <a hlmBtn variant="outline" class="cursor-pointer" [routerLink]="['/pokemon', pokemon().id]">View page</a>
-    @if (onTeam()) {
-      <button hlmBtn type="button" class="cursor-pointer" (click)="toggleTeam()">Remove from team</button>
-    } @else {
-      <button hlmBtn type="button" class="cursor-pointer" [disabled]="teamFull()" (click)="toggleTeam()">
-        Add to team
-      </button>
-    }
+  <div class="grid grid-cols-2 gap-2">
+    <a hlmBtn variant="outline" class="w-full cursor-pointer" [routerLink]="['/pokemon', pokemon().id]">View page</a>
+    <app-add-to-team
+      class="min-w-0 flex-1"
+      [pokemonId]="pokemon().id"
+      [name]="pokemon().name"
+      [sprite]="sprite(pokemon())"
+      [fullWidth]="true"
+      [explainFull]="false"
+      [fullTooltip]="true"
+    />
   </div>
-  @if (teamFull()) {
-    <p role="status" class="text-muted-foreground text-sm">
-      Your team already has {{ teamLimit }} Pokémon. Remove one before adding another.
-    </p>
-  }
 
   <div class="relative h-40 w-40 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2">
     @if (sprite(pokemon()); as src) {

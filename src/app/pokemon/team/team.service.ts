@@ -3,15 +3,29 @@ import { Injectable, PLATFORM_ID, afterNextRender, computed, inject, signal } fr
 
 export const TEAM_LIMIT = 6;
 
+export const TEAM_ROLES = ['Attacker', 'Defender', 'Support'] as const;
+
+export type TeamRole = (typeof TEAM_ROLES)[number];
+
+export const TEAM_ROLE_ICON: Record<TeamRole, string> = {
+  Attacker: 'lucideSword',
+  Defender: 'lucideShield',
+  Support: 'lucideCross',
+};
+
 export type TeamMember = {
   id: number;
   name: string;
   sprite: string | null;
+  nickname: string;
+  role: TeamRole;
 };
 
 export type TeamSlot = TeamMember | null;
 
-export type TeamAddResult = { ok: true } | { ok: false; reason: 'duplicate' | 'full' };
+export type TeamAddResult =
+  | { ok: true }
+  | { ok: false; reason: 'duplicate' | 'full' | 'nickname' | 'role' };
 
 const STORAGE_KEY = 'pokemon-team';
 
@@ -39,10 +53,31 @@ export class TeamService {
     const index = current.findIndex((slot) => slot === null);
     if (index === -1) return { ok: false, reason: 'full' };
 
+    const nickname = normalizeNickname(member.nickname);
+    if (!nickname) return { ok: false, reason: 'nickname' };
+    if (!isTeamRole(member.role)) return { ok: false, reason: 'role' };
+
     const next = current.slice();
-    next[index] = { id: member.id, name: member.name, sprite: member.sprite };
+    next[index] = {
+      id: member.id,
+      name: member.name,
+      sprite: member.sprite,
+      nickname,
+      role: member.role,
+    };
     this.save(next);
     return { ok: true };
+  }
+
+  setRole(id: number, role: TeamRole): void {
+    if (!isTeamRole(role)) return;
+    const current = this.slots();
+    const index = current.findIndex((slot) => slot?.id === id);
+    const member = current[index];
+    if (!member || member.role === role) return;
+    const next = current.slice();
+    next[index] = { ...member, role };
+    this.save(next);
   }
 
   remove(id: number): void {
@@ -116,8 +151,29 @@ function slotsFromStorage(parsed: unknown[]): TeamSlot[] {
 
 function toMember(value: unknown): TeamMember | null {
   if (!value || typeof value !== 'object') return null;
-  const member = value as TeamMember;
+  const member = value as Partial<TeamMember>;
   if (typeof member.id !== 'number' || typeof member.name !== 'string') return null;
   if (member.sprite !== null && typeof member.sprite !== 'string') return null;
-  return { id: member.id, name: member.name, sprite: member.sprite };
+
+  const nickname =
+    (typeof member.nickname === 'string' ? normalizeNickname(member.nickname) : null) ??
+    legacyNickname(member.name);
+  const role = isTeamRole(member.role) ? member.role : 'Attacker';
+
+  return { id: member.id, name: member.name, sprite: member.sprite ?? null, nickname, role };
+}
+
+export function isTeamRole(value: unknown): value is TeamRole {
+  return typeof value === 'string' && (TEAM_ROLES as readonly string[]).includes(value);
+}
+
+export function normalizeNickname(value: string): string | null {
+  const nickname = value.trim();
+  if (nickname.length < 3 || nickname.length > 12) return null;
+  return nickname;
+}
+
+function legacyNickname(name: string): string {
+  const trimmed = name.trim();
+  return trimmed.length <= 12 ? trimmed : trimmed.slice(0, 12);
 }

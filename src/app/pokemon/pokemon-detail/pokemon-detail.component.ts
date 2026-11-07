@@ -8,6 +8,7 @@ import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmSwitch } from '@spartan-ng/helm/switch';
 import { catchError, forkJoin, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { PokemonSprite } from '../pokemon-sprite/pokemon-sprite.component';
+import { AddToTeam } from '../team/add-to-team/add-to-team.component';
 import { Pokemon, PokemonService, PokemonSpecies, PokemonType } from '../pokemon.service';
 import { TEAM_LIMIT, TeamService } from '../team/team.service';
 import { latestFrontDefault } from '../utils/latest-front-default';
@@ -50,7 +51,7 @@ type PokemonDetailState =
 @Component({
   selector: 'app-pokemon-detail',
   templateUrl: './pokemon-detail.component.html',
-  imports: [RouterLink, TitleCasePipe, DecimalPipe, NgOptimizedImage, HlmButton, HlmSwitch, NgIcon, PokemonSprite],
+  imports: [RouterLink, TitleCasePipe, DecimalPipe, NgOptimizedImage, HlmButton, HlmSwitch, NgIcon, PokemonSprite, AddToTeam],
   providers: [provideIcons({ lucideVolume2 })],
 })
 export class PokemonDetail {
@@ -200,17 +201,8 @@ export class PokemonDetail {
     this.gameId.set(game.id);
   }
 
-  protected toggleTeam(pokemon: Pokemon): void {
-    if (this.team.has(pokemon.id)) {
-      this.team.remove(pokemon.id);
-      return;
-    }
-
-    this.team.add({
-      id: pokemon.id,
-      name: pokemon.name,
-      sprite: latestFrontDefault(pokemon.sprites.versions) ?? pokemon.sprites.front_default,
-    });
+  protected teamSprite(pokemon: Pokemon): string | null {
+    return latestFrontDefault(pokemon.sprites.versions) ?? pokemon.sprites.front_default;
   }
 
   protected playCry(): void {

@@ -65,17 +65,14 @@
             <ng-icon name="lucideVolume2" />
           </button>
           }
-          <button
-            hlmBtn
-            type="button"
-            variant="outline"
-            class="cursor-pointer rounded-xl"
-            [disabled]="teamFull()"
-            [attr.aria-pressed]="onTeam()"
-            (click)="toggleTeam(detail.pokemon)"
-          >
-            {{ onTeam() ? 'Remove from team' : 'Add to team' }}
-          </button>
+          <app-add-to-team
+            [pokemonId]="detail.pokemon.id"
+            [name]="detail.pokemon.name"
+            [sprite]="teamSprite(detail.pokemon)"
+            appearance="outline"
+            [rounded]="true"
+            [explainFull]="false"
+          />
         </div>
       </div>
       @if (teamFull()) {

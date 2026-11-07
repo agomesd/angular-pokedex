@@ -1,8 +1,8 @@
 <span
-  class="pointer-events-none absolute top-2 left-3 z-10 inline-flex max-w-[calc(100%-1.5rem)] items-baseline gap-1 truncate rounded-full bg-white/70 px-4 py-1 text-xs font-semibold text-indigo-950 sm:text-sm">
+  class="pointer-events-none absolute top-2 left-3 z-10 inline-flex max-w-[calc(100%-4.5rem)] items-baseline gap-1 truncate rounded-full bg-white/70 px-4 py-1 text-xs font-semibold text-indigo-950 sm:text-sm">
   <span>{{ index() + 1 }}</span>
   @if (member(); as member) {
-  <span class="min-w-0 truncate font-medium">{{ member.name | titlecase }}</span>
+  <span class="min-w-0 truncate font-medium">{{ member.nickname }}</span>
   }
 </span>
 @if (member(); as member) {
@@ -22,7 +22,7 @@
 <div data-reorder tabindex="0" draggable="true"
   class="flex h-full cursor-grab touch-none flex-col items-center justify-center gap-1 rounded-2xl px-2 pt-6 pb-12 outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 active:cursor-grabbing"
   (dragstart)="dragStarted.emit($event)" (dragend)="dragEnded.emit()"
-  [attr.aria-label]="(member.name | titlecase) + ', slot ' + (index() + 1)" aria-describedby="team-reorder-hint"
+  [attr.aria-label]="member.nickname + ', ' + (member.name | titlecase) + ', ' + member.role + ', slot ' + (index() + 1)" aria-describedby="team-reorder-hint"
   [attr.aria-grabbed]="dragging()" (pointerdown)="pointerPressed.emit($event)" (pointermove)="pointerMoved.emit($event)"
   (pointerup)="pointerReleased.emit($event)" (pointercancel)="pointerCancelled.emit($event)"
   (keydown)="reorderKey.emit($event)">
@@ -32,6 +32,53 @@
   </span>
   } @else {
   <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 sm:size-24" />
+  }
+</div>
+<div
+  class="absolute top-2 right-3 z-20"
+  (pointerdown)="$event.stopPropagation()"
+  (dragstart)="$event.preventDefault(); $event.stopPropagation()"
+  (focusout)="onRoleFocusOut($event)"
+  (keydown.escape)="roleMenuOpen.set(false)"
+>
+  <button
+    type="button"
+    class="inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/70 text-indigo-950 outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 sm:size-8"
+    [brnTooltip]="member.role"
+    [tooltipDisabled]="roleMenuOpen() || tooltipSuppressed()"
+    position="right"
+    [attr.aria-label]="'Change role, currently ' + member.role"
+    [attr.aria-expanded]="roleMenuOpen()"
+    aria-haspopup="listbox"
+    [attr.aria-controls]="'team-slot-role-' + index()"
+    (pointerdown)="suppressTooltip($event)"
+    (pointerleave)="tooltipSuppressed.set(false)"
+    (click)="suppressTooltip($event); toggleRoleMenu()"
+  >
+    <ng-icon [name]="roleIcons[member.role]" class="size-4" />
+  </button>
+  @if (roleMenuOpen()) {
+    <ul
+      [id]="'team-slot-role-' + index()"
+      role="listbox"
+      class="bg-popover absolute top-full right-0 z-20 mt-1 w-max rounded-md border p-1 shadow-md"
+    >
+      @for (role of roles; track role) {
+        <li role="presentation">
+          <button
+            type="button"
+            role="option"
+            class="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs hover:bg-accent"
+            [class.bg-accent]="role === member.role"
+            [attr.aria-selected]="role === member.role"
+            (click)="selectRole(role)"
+          >
+            <ng-icon [name]="roleIcons[role]" class="size-3.5" />
+            <span>{{ role }}</span>
+          </button>
+        </li>
+      }
+    </ul>
   }
 </div>
 <div class="absolute right-0 bottom-0 z-10 flex items-center gap-2 rounded-tl-3xl bg-white/70 p-2" role="group"

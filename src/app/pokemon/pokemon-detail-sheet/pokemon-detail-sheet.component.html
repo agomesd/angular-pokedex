@@ -1,4 +1,4 @@
-<hlm-sheet side="right" [class.w-full]="trigger() === 'text'">
+<hlm-sheet side="right" [class.min-w-0]="trigger() === 'text'" [class.flex-1]="trigger() === 'text'">
   @if (trigger() === 'icon') {
     <button
       hlmBtn
@@ -13,7 +13,7 @@
       <ng-icon name="lucideInfo" />
     </button>
   } @else {
-    <button hlmBtn variant="outline" hlmSheetTrigger class="w-full cursor-pointer" (click)="load()">
+    <button hlmBtn variant="outline" hlmSheetTrigger class="w-full min-w-0 cursor-pointer" (click)="load()">
       {{ label() ?? 'View details' }}
     </button>
   }

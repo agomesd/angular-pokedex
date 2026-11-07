@@ -1,0 +1,138 @@
+<div class="flex flex-col gap-2" [class.w-full]="fullWidth()">
+  @if (onTeam()) {
+    <button
+      hlmBtn
+      type="button"
+      [variant]="appearance()"
+      class="cursor-pointer"
+      [class.w-full]="fullWidth()"
+      [class.rounded-xl]="rounded()"
+      (click)="remove()"
+    >
+      Remove from team
+    </button>
+  } @else {
+    <hlm-dialog class="block" [class.w-full]="fullWidth()" (stateChanged)="onDialogState($event)">
+      @if (teamFull() && fullTooltip()) {
+        <span class="block w-full" tabindex="0" [brnTooltip]="fullTeamMessage" position="bottom">
+          <button
+            hlmBtn
+            type="button"
+            [variant]="appearance()"
+            class="pointer-events-none w-full"
+            [class.rounded-xl]="rounded()"
+            disabled
+            [attr.aria-describedby]="'team-full-' + pokemonId()"
+          >
+            Add to team
+          </button>
+        </span>
+        <span [id]="'team-full-' + pokemonId()" class="sr-only">{{ fullTeamMessage }}</span>
+      } @else {
+      <button
+        hlmBtn
+        hlmDialogTrigger
+        type="button"
+        [variant]="appearance()"
+        class="cursor-pointer"
+        [class.w-full]="fullWidth()"
+        [class.rounded-xl]="rounded()"
+        [disabled]="teamFull()"
+      >
+        Add to team
+      </button>
+      }
+      <ng-template brnDialogContent>
+        <hlm-dialog-content>
+          <div hlmDialogHeader>
+            <h2 hlmDialogTitle>Add {{ name() | titlecase }}</h2>
+            <p hlmDialogDescription>Give this Pokémon a nickname and a role on your team.</p>
+          </div>
+          <form class="flex flex-col gap-3" (submit)="submit(); $event.preventDefault()">
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-medium" [attr.for]="'team-nickname-' + pokemonId()">Nickname</label>
+              <input
+                [id]="'team-nickname-' + pokemonId()"
+                type="text"
+                class="border-input bg-background h-7 w-full rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                maxlength="12"
+                autocomplete="off"
+                [formControl]="form.controls.nickname"
+                [attr.aria-invalid]="nicknameError() ? true : null"
+                [attr.aria-describedby]="nicknameError() ? 'team-nickname-error-' + pokemonId() : null"
+              />
+              @if (nicknameError(); as message) {
+                <p [id]="'team-nickname-error-' + pokemonId()" role="alert" class="text-destructive text-xs">
+                  {{ message }}
+                </p>
+              }
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-sm font-medium" [attr.for]="'team-role-' + pokemonId()">Role</label>
+              <div class="relative" (focusout)="onRoleFocusOut($event)" (keydown.escape)="roleMenuOpen.set(false)">
+                <button
+                  [id]="'team-role-' + pokemonId()"
+                  type="button"
+                  class="border-input bg-background flex h-7 w-full cursor-pointer items-center gap-2 rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  [attr.aria-invalid]="roleError() ? true : null"
+                  [attr.aria-describedby]="roleError() ? 'team-role-error-' + pokemonId() : null"
+                  [attr.aria-expanded]="roleMenuOpen()"
+                  aria-haspopup="listbox"
+                  [attr.aria-controls]="'team-role-list-' + pokemonId()"
+                  (click)="toggleRoleMenu()"
+                >
+                  @if (form.controls.role.value; as role) {
+                    <ng-icon [name]="roleIcons[role]" class="size-3.5" />
+                    <span>{{ role }}</span>
+                  } @else {
+                    <span class="text-muted-foreground">Select a role</span>
+                  }
+                  <ng-icon name="lucideChevronDown" class="ml-auto size-3.5 opacity-60" />
+                </button>
+                @if (roleMenuOpen()) {
+                  <ul
+                    [id]="'team-role-list-' + pokemonId()"
+                    role="listbox"
+                    class="bg-popover absolute z-20 mt-1 w-full rounded-md border p-1 shadow-md"
+                  >
+                    @for (role of roles; track role) {
+                      <li role="presentation">
+                        <button
+                          type="button"
+                          role="option"
+                          class="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs hover:bg-accent"
+                          [attr.aria-selected]="form.controls.role.value === role"
+                          (click)="selectRole(role)"
+                        >
+                          <ng-icon [name]="roleIcons[role]" class="size-3.5" />
+                          <span>{{ role }}</span>
+                        </button>
+                      </li>
+                    }
+                  </ul>
+                }
+              </div>
+              @if (roleError(); as message) {
+                <p [id]="'team-role-error-' + pokemonId()" role="alert" class="text-destructive text-xs">
+                  {{ message }}
+                </p>
+              }
+            </div>
+            @if (addError(); as message) {
+              <p role="alert" class="text-destructive text-xs">{{ message }}</p>
+            }
+            <div hlmDialogFooter>
+              <button hlmBtn type="button" variant="outline" class="cursor-pointer" hlmDialogClose>Cancel</button>
+              <button hlmBtn type="submit" class="cursor-pointer">Add to team</button>
+            </div>
+          </form>
+        </hlm-dialog-content>
+      </ng-template>
+    </hlm-dialog>
+  }
+  @if (explainFull() && teamFull()) {
+    <p role="status" class="text-muted-foreground text-sm">
+      {{ fullTeamMessage }}
+    </p>
+  }
+</div>

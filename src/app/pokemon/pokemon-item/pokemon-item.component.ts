@@ -1,12 +1,14 @@
 import { NgOptimizedImage, TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmSpinner } from '@spartan-ng/helm/spinner';
 import { latestFrontDefault } from '../utils/latest-front-default';
 import { latestSymbolIcon } from '../utils/latest-symbol-icon';
 import { typeColour } from '../utils/type-colour';
 import { PokemonDetailSheet } from '../pokemon-detail-sheet/pokemon-detail-sheet.component';
+import { AddToTeam } from '../team/add-to-team/add-to-team.component';
 import { PokemonSprite } from '../pokemon-sprite/pokemon-sprite.component';
 import { Pokemon, PokemonService, PokemonType } from '../pokemon.service';
 
@@ -15,9 +17,11 @@ import { Pokemon, PokemonService, PokemonType } from '../pokemon.service';
   templateUrl: './pokemon-item.component.html',
   imports: [
     HlmCardImports,
+    HlmButton,
     TitleCasePipe,
     NgOptimizedImage,
     PokemonDetailSheet,
+    AddToTeam,
     PokemonSprite,
     HlmSpinner,
   ],
