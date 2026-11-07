@@ -1,10 +1,15 @@
-<app-pokemon-search [totalPokemon]="list()?.count ?? null" (listIndex)="showPokemon($event)" />
-@if (list(); as data) {
-  <hlm-numbered-pagination
-    [(currentPage)]="page"
-    [(itemsPerPage)]="pageSize"
-    [totalItems]="data.count"
+<div class="flex flex-wrap items-end gap-3 p-4">
+  <div class="min-w-56 flex-1">
+    <app-pokemon-search [totalPokemon]="list()?.count ?? null" (listIndex)="showPokemon($event)" />
+  </div>
+  <app-pokemon-pagination
+    [page]="page()"
+    [hasNext]="list()?.next != null"
+    [lastPage]="lastPage()"
+    (pageChange)="page.set($event)"
   />
+</div>
+@if (list(); as data) {
   <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
     @for (p of data.results; track p.name) {
       <app-pokemon-item [name]="p.name" />

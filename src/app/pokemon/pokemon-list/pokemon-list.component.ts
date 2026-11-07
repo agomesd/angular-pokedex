@@ -2,9 +2,9 @@ import { isPlatformBrowser } from '@angular/common';
 import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HlmNumberedPagination } from '@spartan-ng/helm/pagination';
 import { switchMap } from 'rxjs';
 import { PokemonItem } from '../pokemon-item/pokemon-item.component';
+import { PokemonPagination } from '../pokemon-pagination/pokemon-pagination.component';
 import { PokemonService } from '../pokemon.service';
 import { PokemonSearchComponent } from '../search/pokemon-search.component';
 import { DEFAULT_POKEMON_PAGE_SIZE, listPageQuery, pageForListIndex } from '../utils/list-page';
@@ -12,7 +12,7 @@ import { DEFAULT_POKEMON_PAGE_SIZE, listPageQuery, pageForListIndex } from '../u
 @Component({
   selector: 'app-pokemon-list',
   templateUrl: './pokemon-list.html',
-  imports: [PokemonItem, HlmNumberedPagination, PokemonSearchComponent],
+  imports: [PokemonItem, PokemonSearchComponent, PokemonPagination],
 })
 export class PokemonList {
   private pokemonService = inject(PokemonService);
@@ -21,7 +21,6 @@ export class PokemonList {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly page = signal(listPageQuery(this.route.snapshot.queryParamMap.get('page')));
-  protected readonly pageSize = signal(DEFAULT_POKEMON_PAGE_SIZE);
 
   constructor() {
     effect(() => {
@@ -36,15 +35,27 @@ export class PokemonList {
         replaceUrl: true,
       });
     });
+
+    effect(() => {
+      const lastPage = this.lastPage();
+      if (lastPage == null) return;
+      if (this.page() > lastPage) this.page.set(lastPage);
+    });
   }
 
+  protected readonly lastPage = computed(() => {
+    const count = this.list()?.count;
+    if (count == null) return null;
+    return Math.max(1, Math.ceil(count / DEFAULT_POKEMON_PAGE_SIZE));
+  });
+
   protected showPokemon(index: number): void {
-    this.page.set(pageForListIndex(index, this.pageSize()));
+    this.page.set(pageForListIndex(index));
   }
 
   private readonly query = computed(() => ({
-    limit: this.pageSize(),
-    offset: (this.page() - 1) * this.pageSize(),
+    limit: DEFAULT_POKEMON_PAGE_SIZE,
+    offset: (this.page() - 1) * DEFAULT_POKEMON_PAGE_SIZE,
   }));
 
   protected readonly list = toSignal(

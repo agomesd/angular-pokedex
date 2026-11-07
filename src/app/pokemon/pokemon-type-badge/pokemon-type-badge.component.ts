@@ -6,6 +6,7 @@ import { typeBackground } from '../utils/type-colour';
 @Component({
   selector: 'app-pokemon-type-badge',
   templateUrl: './pokemon-type-badge.component.html',
+  host: { class: 'inline-flex' },
   imports: [NgOptimizedImage, TitleCasePipe, BrnTooltip],
   providers: [
     provideBrnTooltipDefaultOptions({

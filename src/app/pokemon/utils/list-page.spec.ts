@@ -19,4 +19,9 @@ describe('pokemon list pages', () => {
     expect(pageForListIndex(1025, 20)).toBe(52);
     expect(pokemonListPage(235, 20)).toBe(12);
   });
+
+  it('pages a form by its list position instead of its id', () => {
+    const entry = listEntryForId(directory, 10001);
+    expect(pageForListIndex(entry!.index, 20)).toBe(1);
+  });
 });

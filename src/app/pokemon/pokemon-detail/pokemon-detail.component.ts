@@ -20,7 +20,8 @@ import { generationLabel } from '../utils/generation-order';
 import { englishGenus, genderLabel, hatchSteps, pokedexEntry } from '../utils/species-summary';
 import { artworkFrames, GameView, generationViews, GenerationView } from '../utils/sprite-gallery';
 import { typeColour } from '../utils/type-colour';
-import { pokemonListPage } from '../utils/list-page';
+import { pageForListIndex } from '../utils/list-page';
+import { listEntryForId, listEntryForName } from '../utils/pokemon-directory';
 
 function pokemonPageId(value: string): number | null {
   if (!/^\d+$/.test(value)) return null;
@@ -64,6 +65,7 @@ export class PokemonDetail {
   private readonly reload = signal(0);
   private readonly cry = viewChild<ElementRef<HTMLAudioElement>>('cry');
   private readonly viewedId = signal<number | null>(null);
+  private readonly listPage = signal<number | null>(null);
   private servedReload = -1;
 
   protected readonly generation = signal<string | null>(null);
@@ -97,10 +99,8 @@ export class PokemonDetail {
   });
 
   protected readonly backToAllQuery = computed(() => {
-    const id = this.pageId();
-    if (id === null) return {};
-    const page = pokemonListPage(id);
-    return page > 1 ? { page } : {};
+    const page = this.listPage();
+    return page !== null && page > 1 ? { page } : {};
   });
 
   private readonly found = computed(() => {
@@ -163,6 +163,21 @@ export class PokemonDetail {
   protected readonly hatchSteps = hatchSteps;
 
   constructor() {
+    effect((onCleanup) => {
+      const pokemon = this.found()?.pokemon;
+      if (!pokemon) {
+        this.listPage.set(null);
+        return;
+      }
+
+      const id = pokemon.id;
+      const request = this.listPageFor(id, pokemon.name).subscribe((page) => {
+        if (this.found()?.pokemon.id !== id) return;
+        this.listPage.set(page);
+      });
+      onCleanup(() => request.unsubscribe());
+    });
+
     effect(() => {
       const id = this.found()?.pokemon.id ?? null;
       if (id === this.viewedId()) return;
@@ -181,6 +196,24 @@ export class PokemonDetail {
       const id = String(state.pokemon.id);
       if (param === id) return;
       void this.router.navigate(['/pokemon', id], { replaceUrl: true });
+    });
+  }
+
+  protected backToAll(event: Event): void {
+    if (this.listPage() !== null) return;
+
+    event.preventDefault();
+    const pokemon = this.found()?.pokemon;
+    if (!pokemon) {
+      void this.router.navigate(['/pokemon']);
+      return;
+    }
+
+    this.listPageFor(pokemon.id, pokemon.name).subscribe((page) => {
+      this.listPage.set(page);
+      void this.router.navigate(['/pokemon'], {
+        queryParams: page > 1 ? { page } : {},
+      });
     });
   }
 
@@ -236,6 +269,14 @@ export class PokemonDetail {
 
   protected statTotal(pokemon: Pokemon): number {
     return pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0);
+  }
+
+  private listPageFor(id: number, name: string): Observable<number> {
+    return this.pokemonService.directory().pipe(
+      map((entries) => listEntryForId(entries, id) ?? listEntryForName(entries, name)),
+      map((entry) => (entry ? pageForListIndex(entry.index) : 1)),
+      catchError(() => of(1)),
+    );
   }
 
   private pageId(): number | null {

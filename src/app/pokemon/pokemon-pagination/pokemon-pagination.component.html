@@ -1,0 +1,20 @@
+<nav class="flex shrink-0 items-center gap-1.5 bg-primary rounded-full px-4 py-2" aria-label="Pagination">
+  <button hlmBtn variant="outline" type="button" size="icon" class="size-9 rounded-full" aria-label="Skip 10 pages back"
+    [disabled]="!canSkipPrevious()" (click)="skipPrevious()">
+    <ng-icon name="lucideArrowBigLeftDash" class="size-5 [&_path]:fill-white [&_path]:stroke-white" />
+  </button>
+  <button hlmBtn variant="outline" type="button" size="icon-lg" class="size-14 rounded-full" aria-label="Previous page"
+    [disabled]="!canGoPrevious()" (click)="previous()">
+    <ng-icon name="lucideArrowBigLeft" class="size-8 [&_path]:fill-white [&_path]:stroke-white" />
+  </button>
+  <span class="min-w-8 px-1 text-center text-white text-sm font-semibold tabular-nums" aria-current="page"
+    [attr.aria-label]="'Page ' + page()">{{ page() }}</span>
+  <button hlmBtn variant="outline" type="button" size="icon-lg" class="size-14 rounded-full" aria-label="Next page"
+    [disabled]="!canGoNext()" (click)="next()">
+    <ng-icon name="lucideArrowBigRight" class="size-8 [&_path]:fill-white [&_path]:stroke-white" />
+  </button>
+  <button hlmBtn variant="outline" type="button" size="icon" class="size-9 rounded-full"
+    aria-label="Skip 10 pages forward" [disabled]="!canSkipNext()" (click)="skipNext()">
+    <ng-icon name="lucideArrowBigRightDash" class="size-5 [&_path]:fill-white [&_path]:stroke-white" />
+  </button>
+</nav>
