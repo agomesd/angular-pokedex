@@ -19,7 +19,7 @@
     </p>
   }
 
-  <div class="relative h-40 w-40 rounded-2xl bg-indigo-200 p-2">
+  <div class="relative h-40 w-40 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2">
     @if (sprite(pokemon()); as src) {
       <app-pokemon-sprite [src]="src" [alt]="pokemon().name | titlecase" />
     } @else {

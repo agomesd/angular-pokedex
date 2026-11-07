@@ -1,0 +1,57 @@
+<hlm-sheet side="right" [class.w-full]="trigger() === 'text'">
+  @if (trigger() === 'icon') {
+    <button
+      hlmBtn
+      hlmSheetTrigger
+      type="button"
+      variant="outline"
+      size="icon-sm"
+      class="cursor-pointer rounded-xl"
+      [attr.aria-label]="label() ?? ((name() | titlecase) + ' details')"
+      (click)="load()"
+    >
+      <ng-icon name="lucideInfo" />
+    </button>
+  } @else {
+    <button hlmBtn variant="outline" hlmSheetTrigger class="w-full cursor-pointer" (click)="load()">
+      {{ label() ?? 'View details' }}
+    </button>
+  }
+  <ng-template brnSheetContent>
+    <hlm-sheet-content class="overflow-y-auto sm:max-w-md">
+      @if (state(); as state) {
+        @if (state.status === 'found') {
+          @if (types(); as types) {
+            <app-pokemon-details [pokemon]="state.pokemon" [types]="types" />
+          } @else {
+            <app-pokemon-details [pokemon]="state.pokemon" />
+          }
+        } @else if (state.status === 'error') {
+          <div hlmSheetHeader>
+            <h2 hlmSheetTitle class="text-base">{{ name() ? (name() | titlecase) : 'Details' }}</h2>
+            <p hlmSheetDescription role="alert">
+              PokéAPI could not be reached. Check your connection and try again.
+            </p>
+          </div>
+          <div class="px-6 pb-6">
+            <button hlmBtn type="button" variant="outline" class="cursor-pointer" (click)="load()">Try again</button>
+          </div>
+        } @else {
+          <div hlmSheetHeader>
+            <h2 hlmSheetTitle class="text-base">{{ name() ? (name() | titlecase) : 'Loading details' }}</h2>
+            <p hlmSheetDescription role="status">
+              {{ name() ? 'Loading details…' : 'Fetching this Pokémon.' }}
+            </p>
+          </div>
+        }
+      } @else {
+        <div hlmSheetHeader>
+          <h2 hlmSheetTitle class="text-base">{{ name() ? (name() | titlecase) : 'Loading details' }}</h2>
+          <p hlmSheetDescription role="status">
+            {{ name() ? 'Loading details…' : 'Fetching this Pokémon.' }}
+          </p>
+        </div>
+      }
+    </hlm-sheet-content>
+  </ng-template>
+</hlm-sheet>

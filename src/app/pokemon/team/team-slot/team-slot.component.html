@@ -1,0 +1,54 @@
+<span
+  class="pointer-events-none absolute top-2 left-3 z-10 inline-flex max-w-[calc(100%-1.5rem)] items-baseline gap-1 truncate rounded-full bg-white/70 px-4 py-1 text-xs font-semibold text-indigo-950 sm:text-sm">
+  <span>{{ index() + 1 }}</span>
+  @if (member(); as member) {
+  <span class="min-w-0 truncate font-medium">{{ member.name | titlecase }}</span>
+  }
+</span>
+@if (member(); as member) {
+  @if (typeIcons().length) {
+    <div class="pointer-events-none absolute bottom-2 left-3 z-10 flex items-center gap-1">
+      @for (type of typeIcons(); track type.name) {
+        <img
+          [ngSrc]="type.icon"
+          [alt]="type.name | titlecase"
+          width="24"
+          height="24"
+          class="size-6 rounded-full bg-white/70 sm:size-7"
+        />
+      }
+    </div>
+  }
+<div data-reorder tabindex="0" draggable="true"
+  class="flex h-full cursor-grab touch-none flex-col items-center justify-center gap-1 rounded-2xl px-2 pt-6 pb-12 outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 active:cursor-grabbing"
+  (dragstart)="dragStarted.emit($event)" (dragend)="dragEnded.emit()"
+  [attr.aria-label]="(member.name | titlecase) + ', slot ' + (index() + 1)" aria-describedby="team-reorder-hint"
+  [attr.aria-grabbed]="dragging()" (pointerdown)="pointerPressed.emit($event)" (pointermove)="pointerMoved.emit($event)"
+  (pointerup)="pointerReleased.emit($event)" (pointercancel)="pointerCancelled.emit($event)"
+  (keydown)="reorderKey.emit($event)">
+  @if (member.sprite; as src) {
+  <span class="relative size-16 sm:size-28">
+    <app-pokemon-sprite [src]="src" [alt]="member.name | titlecase" />
+  </span>
+  } @else {
+  <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 sm:size-24" />
+  }
+</div>
+<div class="absolute right-0 bottom-0 z-10 flex items-center gap-2 rounded-tl-3xl bg-white/70 p-2" role="group"
+  [attr.aria-label]="(member.name | titlecase) + ' actions'" (pointerdown)="$event.stopPropagation()"
+  (dragstart)="$event.preventDefault(); $event.stopPropagation()">
+  <button hlmBtn type="button" variant="outline" size="icon-sm" class="cursor-pointer rounded-xl"
+    [attr.aria-label]="'Remove ' + (member.name | titlecase) + ' from team'" (click)="remove.emit(member.id)">
+    <ng-icon name="lucideTrash2" />
+  </button>
+  <app-pokemon-detail-sheet trigger="icon" [pokemonId]="member.id" [name]="member.name" />
+</div>
+} @else {
+<a
+  routerLink="/pokemon"
+  class="flex h-full cursor-pointer items-center justify-center rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-indigo-600"
+  [attr.aria-label]="'Open Pokédex, slot ' + (index() + 1)"
+>
+  <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 opacity-80 sm:size-24" />
+</a>
+}

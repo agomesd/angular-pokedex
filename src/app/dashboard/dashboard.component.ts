@@ -1,7 +1,6 @@
-import { isPlatformBrowser, TitleCasePipe } from '@angular/common';
+import { isPlatformBrowser } from '@angular/common';
 import { Component, Injector, PLATFORM_ID, afterNextRender, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { PokemonSprite } from '../pokemon/pokemon-sprite/pokemon-sprite.component';
+import { TeamSlotComponent } from '../pokemon/team/team-slot/team-slot.component';
 import { TEAM_LIMIT, TeamService } from '../pokemon/team/team.service';
 
 const COLUMNS = 3;
@@ -9,7 +8,7 @@ const COLUMNS = 3;
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  imports: [RouterLink, TitleCasePipe, PokemonSprite],
+  imports: [TeamSlotComponent],
 })
 export class DashboardComponent {
   private readonly team = inject(TeamService);
@@ -22,7 +21,6 @@ export class DashboardComponent {
 
   private drag: { index: number; pointerId: number; x: number; y: number; moved: boolean } | null = null;
   private nativeDrag = false;
-  private suppressClick = false;
 
   protected pointerDown(index: number, event: PointerEvent): void {
     if (!this.isBrowser || event.button !== 0 || !this.slots()[index]) return;
@@ -47,7 +45,6 @@ export class DashboardComponent {
       return;
     }
     this.nativeDrag = true;
-    this.suppressClick = true;
     this.drag = null;
     event.dataTransfer?.setData('text/plain', String(index));
     if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
@@ -83,11 +80,7 @@ export class DashboardComponent {
     this.drag = null;
     this.dragging.set(null);
     this.over.set(null);
-    if (!moved || to === null || to === from) {
-      if (moved) this.suppressClick = true;
-      return;
-    }
-    this.suppressClick = true;
+    if (!moved || to === null || to === from) return;
     this.team.move(from, to);
     this.focusSlot(to);
   }
@@ -97,14 +90,10 @@ export class DashboardComponent {
     this.drag = null;
     this.dragging.set(null);
     this.over.set(null);
-    this.suppressClick = true;
   }
 
-  protected guardClick(event: Event): void {
-    if (!this.suppressClick) return;
-    event.preventDefault();
-    event.stopPropagation();
-    this.suppressClick = false;
+  protected remove(id: number): void {
+    this.team.remove(id);
   }
 
   protected onKeydown(index: number, event: KeyboardEvent): void {
@@ -125,7 +114,7 @@ export class DashboardComponent {
   private focusSlot(index: number): void {
     if (!this.isBrowser) return;
     afterNextRender(
-      () => document.querySelector<HTMLElement>(`[data-slot="${index}"] a`)?.focus(),
+      () => document.querySelector<HTMLElement>(`[data-team-slot="${index}"] [data-reorder]`)?.focus(),
       { injector: this.injector },
     );
   }
@@ -141,8 +130,8 @@ function neighbor(index: number, key: string): number | null {
 
 function slotIndexAt(x: number, y: number): number | null {
   const hit = document.elementFromPoint(x, y);
-  const slot = hit?.closest<HTMLElement>('[data-slot]');
+  const slot = hit?.closest<HTMLElement>('[data-team-slot]');
   if (!slot) return null;
-  const index = Number(slot.dataset['slot']);
+  const index = Number(slot.dataset['teamSlot']);
   return Number.isInteger(index) ? index : null;
 }

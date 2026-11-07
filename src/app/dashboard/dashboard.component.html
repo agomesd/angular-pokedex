@@ -2,55 +2,29 @@
   <div class="flex flex-col gap-1">
     <h1 class="text-2xl font-semibold">My team</h1>
     <p id="team-reorder-hint" class="text-muted-foreground text-sm">
-      Drag a Pokémon onto a slot, or focus one and use the arrow keys. Select a Pokémon to open its page.
+      Drag a Pokémon onto a slot, or focus one and use the arrow keys.
     </p>
   </div>
 
   <ul class="grid grid-cols-3 gap-3 sm:gap-4" aria-label="Team slots">
     @for (slot of slots(); track $index; let index = $index) {
       <li
-        class="relative aspect-square rounded-2xl bg-indigo-200"
-        [class.opacity-60]="dragging() === index"
-        [class.ring-2]="over() === index && dragging() !== null && dragging() !== index"
-        [class.ring-indigo-600]="over() === index && dragging() !== null && dragging() !== index"
-        [attr.data-slot]="index"
-        [attr.aria-label]="slot ? null : 'Empty slot ' + (index + 1)"
+        appTeamSlot
+        [index]="index"
+        [member]="slot"
+        [dragging]="dragging() === index"
+        [dropTarget]="over() === index && dragging() !== null && dragging() !== index"
         (dragover)="dragOver(index, $event)"
         (drop)="drop(index, $event)"
-      >
-        <span class="absolute top-2 left-3 text-xs font-medium text-indigo-950/70">{{ index + 1 }}</span>
-        @if (slot; as member) {
-          <a
-            draggable="true"
-            class="flex h-full cursor-grab touch-none flex-col items-center justify-center gap-1 rounded-2xl px-2 pt-6 pb-2 outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 active:cursor-grabbing"
-            [routerLink]="['/pokemon', member.id]"
-            (dragstart)="dragStart(index, $event)"
-            (dragend)="dragEnd()"
-            [attr.aria-label]="(member.name | titlecase) + ', slot ' + (index + 1)"
-            aria-describedby="team-reorder-hint"
-            [attr.aria-grabbed]="dragging() === index"
-            (pointerdown)="pointerDown(index, $event)"
-            (pointermove)="pointerMove($event)"
-            (pointerup)="pointerUp($event)"
-            (pointercancel)="pointerCancel($event)"
-            (click)="guardClick($event)"
-            (keydown)="onKeydown(index, $event)"
-          >
-            @if (member.sprite; as src) {
-              <span class="relative size-16 sm:size-28">
-                <app-pokemon-sprite [src]="src" [alt]="member.name | titlecase" />
-              </span>
-            } @else {
-              <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 sm:size-24" />
-            }
-            <span class="w-full truncate text-center text-xs font-medium sm:text-sm">{{ member.name | titlecase }}</span>
-          </a>
-        } @else {
-          <div class="flex h-full items-center justify-center">
-            <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 opacity-80 sm:size-24" />
-          </div>
-        }
-      </li>
+        (dragStarted)="dragStart(index, $event)"
+        (dragEnded)="dragEnd()"
+        (pointerPressed)="pointerDown(index, $event)"
+        (pointerMoved)="pointerMove($event)"
+        (pointerReleased)="pointerUp($event)"
+        (pointerCancelled)="pointerCancel($event)"
+        (reorderKey)="onKeydown(index, $event)"
+        (remove)="remove($event)"
+      ></li>
     }
   </ul>
 </section>
