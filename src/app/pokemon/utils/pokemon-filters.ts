@@ -34,12 +34,14 @@ export const POKEMON_FILTER_GENERATIONS = [
 const EXCLUDED_TYPES = new Set(['unknown', 'shadow', 'stellar']);
 
 export type LegendaryFilter = 'all' | 'legendary' | 'not-legendary';
+export type MythicalFilter = 'all' | 'mythical' | 'not-mythical';
 export type TeamFilter = 'all' | 'on-team' | 'not-on-team';
 
 export type PokemonFilterSelection = {
   types: string[];
   generations: string[];
   legendary: LegendaryFilter;
+  mythical: MythicalFilter;
   team: TeamFilter;
 };
 
@@ -47,6 +49,7 @@ export type PokemonFilterTraits = {
   types: string[];
   generation: string;
   legendary: boolean;
+  mythical: boolean;
 };
 
 export type PokemonFilterCatalog = {
@@ -57,6 +60,7 @@ export const EMPTY_POKEMON_FILTERS: PokemonFilterSelection = {
   types: [],
   generations: [],
   legendary: 'all',
+  mythical: 'all',
   team: 'all',
 };
 
@@ -65,6 +69,7 @@ export function selectionIsActive(selection: PokemonFilterSelection): boolean {
     selection.types.length > 0 ||
     selection.generations.length > 0 ||
     selection.legendary !== 'all' ||
+    selection.mythical !== 'all' ||
     selection.team !== 'all'
   );
 }
@@ -72,6 +77,7 @@ export function selectionIsActive(selection: PokemonFilterSelection): boolean {
 export function sameSelection(a: PokemonFilterSelection, b: PokemonFilterSelection): boolean {
   return (
     a.legendary === b.legendary &&
+    a.mythical === b.mythical &&
     a.team === b.team &&
     sameStrings(a.types, b.types) &&
     sameStrings(a.generations, b.generations)
@@ -94,6 +100,8 @@ export function matchesFilter(
   if (selection.generations.length > 0 && !selection.generations.includes(traits.generation)) return false;
   if (selection.legendary === 'legendary' && !traits.legendary) return false;
   if (selection.legendary === 'not-legendary' && traits.legendary) return false;
+  if (selection.mythical === 'mythical' && !traits.mythical) return false;
+  if (selection.mythical === 'not-mythical' && traits.mythical) return false;
   return true;
 }
 
@@ -110,12 +118,13 @@ export function parsePokemonFilterCatalog(files: {
     typeNameById.set(cell(row, 'id'), name);
   }
 
-  const speciesById = new Map<string, { generation: string; legendary: boolean }>();
+  const speciesById = new Map<string, { generation: string; legendary: boolean; mythical: boolean }>();
   for (const row of records(files.species)) {
     const generation = POKEMON_FILTER_GENERATIONS[Number(cell(row, 'generation_id')) - 1] ?? '';
     speciesById.set(cell(row, 'id'), {
       generation,
       legendary: cell(row, 'is_legendary') === '1',
+      mythical: cell(row, 'is_mythical') === '1',
     });
   }
 
@@ -137,7 +146,12 @@ export function parsePokemonFilterCatalog(files: {
     const types = (typesByPokemon.get(cell(row, 'id')) ?? [])
       .sort((a, b) => a.slot - b.slot)
       .map((type) => type.name);
-    byName.set(name, { types, generation: species.generation, legendary: species.legendary });
+    byName.set(name, {
+      types,
+      generation: species.generation,
+      legendary: species.legendary,
+      mythical: species.mythical,
+    });
   }
 
   if (byName.size === 0) throw new Error('Pokémon filter catalog is empty');

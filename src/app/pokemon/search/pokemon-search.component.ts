@@ -28,7 +28,7 @@ type RangeCheck = {
 
 @Component({
   selector: 'app-pokemon-search',
-  host: { class: 'block min-w-0 flex-1' },
+  host: { class: 'block w-full min-w-0' },
   templateUrl: './pokemon-search.component.html',
   imports: [
     ReactiveFormsModule,

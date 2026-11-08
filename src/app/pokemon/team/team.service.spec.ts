@@ -17,6 +17,44 @@ const squirtle: TeamMember = {
   role: 'Defender',
 };
 
+describe('TeamService.add', () => {
+  let team: TeamService;
+
+  beforeEach(() => {
+    localStorage.removeItem('pokemon-team');
+    TestBed.configureTestingModule({});
+    team = TestBed.inject(TeamService);
+  });
+
+  afterEach(() => localStorage.removeItem('pokemon-team'));
+
+  it('refuses a Pokémon that is already on the team', () => {
+    expect(team.add(bulbasaur)).toEqual({ ok: true });
+
+    expect(team.add({ ...bulbasaur, nickname: 'Saur' })).toEqual({ ok: false, reason: 'duplicate' });
+    expect(team.members()).toEqual([bulbasaur]);
+  });
+
+  it('refuses a seventh Pokémon', () => {
+    for (let id = 1; id <= 6; id += 1) {
+      expect(
+        team.add({
+          id,
+          name: `pokemon-${id}`,
+          sprite: null,
+          nickname: 'Name',
+          role: 'Attacker',
+        }),
+      ).toEqual({ ok: true });
+    }
+
+    expect(
+      team.add({ id: 7, name: 'extra', sprite: null, nickname: 'Extra', role: 'Support' }),
+    ).toEqual({ ok: false, reason: 'full' });
+    expect(team.members().length).toBe(6);
+  });
+});
+
 describe('TeamService.replace', () => {
   let team: TeamService;
 

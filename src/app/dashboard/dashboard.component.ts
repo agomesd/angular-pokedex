@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, Injector, PLATFORM_ID, afterNextRender, inject, signal } from '@angular/core';
+import { Component, Injector, PLATFORM_ID, afterNextRender, computed, inject, signal } from '@angular/core';
 import { TeamSlotComponent } from '../pokemon/team/team-slot/team-slot.component';
 import { TEAM_LIMIT, TeamService } from '../pokemon/team/team.service';
 
@@ -16,6 +16,7 @@ export class DashboardComponent {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   protected readonly slots = this.team.slots;
+  protected readonly teamEmpty = computed(() => this.team.hydrated() && this.team.members().length === 0);
   protected readonly dragging = signal<number | null>(null);
   protected readonly over = signal<number | null>(null);
 

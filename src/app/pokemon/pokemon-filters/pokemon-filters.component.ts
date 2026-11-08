@@ -18,6 +18,7 @@ import {
   sameSelection,
   selectionIsActive,
   type LegendaryFilter,
+  type MythicalFilter,
   type PokemonFilterSelection,
   type TeamFilter,
 } from '../utils/pokemon-filters';
@@ -52,6 +53,11 @@ export class PokemonFilters {
     { value: 'all', label: 'All' },
     { value: 'legendary', label: 'Legendary' },
     { value: 'not-legendary', label: 'Non-legendary' },
+  ];
+  protected readonly mythicalOptions: { value: MythicalFilter; label: string }[] = [
+    { value: 'all', label: 'All' },
+    { value: 'mythical', label: 'Mythical' },
+    { value: 'not-mythical', label: 'Non-mythical' },
   ];
   protected readonly teamOptions: { value: TeamFilter; label: string }[] = [
     { value: 'all', label: 'All' },
@@ -107,6 +113,11 @@ export class PokemonFilters {
     this.update({ legendary: value });
   }
 
+  protected setMythical(value: string): void {
+    if (!isMythicalFilter(value)) return;
+    this.update({ mythical: value });
+  }
+
   protected setTeam(value: string): void {
     if (!isTeamFilter(value)) return;
     this.update({ team: value });
@@ -133,6 +144,10 @@ export class PokemonFilters {
 
 function isLegendaryFilter(value: string): value is LegendaryFilter {
   return value === 'all' || value === 'legendary' || value === 'not-legendary';
+}
+
+function isMythicalFilter(value: string): value is MythicalFilter {
+  return value === 'all' || value === 'mythical' || value === 'not-mythical';
 }
 
 function isTeamFilter(value: string): value is TeamFilter {

@@ -39,7 +39,7 @@ import { isTeamRole, TEAM_ROLE_ICON, TEAM_ROLES, TeamService, TeamSlot } from '.
     '[class.z-20]': 'roleMenuOpen()',
     '[class.opacity-60]': 'dragging()',
     '[class.ring-2]': 'dropTarget()',
-    '[class.ring-indigo-600]': 'dropTarget()',
+    '[class.ring-ring]': 'dropTarget()',
     '[attr.data-team-slot]': 'index()',
     '[attr.aria-label]': 'emptyLabel()',
   },

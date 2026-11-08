@@ -4,6 +4,11 @@
     <p id="team-reorder-hint" class="text-muted-foreground text-sm">
       Drag a Pokémon onto a slot, or focus one and use the arrow keys.
     </p>
+    @if (teamEmpty()) {
+    <p role="status" class="text-muted-foreground text-sm">
+      Your team is empty. Open the Pokédex and add up to six Pokémon.
+    </p>
+    }
   </div>
 
   <ul class="grid grid-cols-3 gap-3 sm:gap-4" aria-label="Team slots">

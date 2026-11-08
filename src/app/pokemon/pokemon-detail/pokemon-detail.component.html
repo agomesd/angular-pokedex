@@ -87,16 +87,14 @@
       <div class="flex flex-col gap-2">
         <h2 class="text-sm font-medium">Generations</h2>
         <div class="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Sprite generation">
-          <button type="button" class="shrink-0 cursor-pointer rounded-full border px-3 py-1 text-sm"
-            [class.border-transparent]="generation() === null" [class.bg-indigo-600]="generation() === null"
-            [class.text-white]="generation() === null" [attr.aria-pressed]="generation() === null"
+          <button hlmBtn type="button" size="sm" class="shrink-0 cursor-pointer rounded-full"
+            [variant]="generation() === null ? 'default' : 'outline'" [attr.aria-pressed]="generation() === null"
             (click)="showArtwork()">
             Artwork
           </button>
           @for (gen of gallery(); track gen.id) {
-          <button type="button" class="shrink-0 cursor-pointer rounded-full border px-3 py-1 text-sm"
-            [class.border-transparent]="generation() === gen.id" [class.bg-indigo-600]="generation() === gen.id"
-            [class.text-white]="generation() === gen.id" [attr.aria-label]="gen.label"
+          <button hlmBtn type="button" size="sm" class="shrink-0 cursor-pointer rounded-full"
+            [variant]="generation() === gen.id ? 'default' : 'outline'" [attr.aria-label]="gen.label"
             [attr.aria-pressed]="generation() === gen.id" (click)="showGeneration(gen)">
             {{ gen.numeral }}
           </button>
@@ -107,9 +105,9 @@
       @if (selectedGeneration(); as gen) {
       <div class="flex flex-wrap gap-2" role="group" [attr.aria-label]="gen.label + ' games'">
         @for (game of gen.games; track game.id) {
-        <button type="button" class="cursor-pointer rounded-full border px-3 py-1 text-sm"
-          [class.border-transparent]="gameId() === game.id" [class.bg-indigo-600]="gameId() === game.id"
-          [class.text-white]="gameId() === game.id" [attr.aria-pressed]="gameId() === game.id" (click)="showGame(game)">
+        <button hlmBtn type="button" size="sm" class="cursor-pointer rounded-full"
+          [variant]="gameId() === game.id ? 'default' : 'outline'" [attr.aria-pressed]="gameId() === game.id"
+          (click)="showGame(game)">
           {{ game.label }}
         </button>
         }
@@ -271,7 +269,7 @@
               </span>
             </div>
             <div class="bg-muted h-1.5 rounded-full">
-              <div class="h-full rounded-full bg-indigo-500" [style.width.%]="statWidth(stat.base_stat)"></div>
+              <div class="h-full rounded-full bg-primary" [style.width.%]="statWidth(stat.base_stat)"></div>
             </div>
           </li>
           }

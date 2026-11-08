@@ -18,9 +18,18 @@
   </hlm-card-header>
   <div hlmCardContent>
     <div class="relative h-32 w-32 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2">
-      @if (pokemon(); as p) {
+      @if (cardStatus() === 'loading') {
+      <app-pokeball-spinner class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+      } @else if (cardStatus() === 'error') {
+      <div class="absolute inset-0 flex flex-col items-center justify-center gap-2 p-2 text-center">
+        <p class="text-destructive text-xs">Could not load this Pokémon.</p>
+        <button hlmBtn type="button" variant="outline" size="sm" (click)="retry()">Try again</button>
+      </div>
+      } @else if (pokemon(); as p) {
       @if (pokemonSprite(p); as src) {
       <app-pokemon-sprite [src]="src" [alt]="name() | titlecase" />
+      } @else {
+      <span class="text-muted-foreground absolute inset-0 grid place-items-center text-sm">No image</span>
       }
       }
     </div>

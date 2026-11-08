@@ -7,12 +7,17 @@
   <app-pokemon-filters [selection]="filters()" (filtersChange)="applyFilters($event)" />
 </div>
 @if (view(); as current) {
-@if (current.status === 'loading' && filtersActive()) {
-<p role="status" class="text-muted-foreground px-4 pb-4 text-sm">Filtering Pokémon…</p>
+@if (current.status === 'loading') {
+<p role="status" class="text-muted-foreground px-4 pb-4 text-sm">
+  {{ filtersActive() ? 'Filtering Pokémon…' : 'Loading Pokémon…' }}
+</p>
 } @else if (current.status === 'error') {
 <p role="alert" class="flex flex-wrap items-center gap-3 px-4 pb-4 text-sm">
-  <span class="text-destructive">Filters could not be loaded. Check your connection and try again.</span>
-  <button hlmBtn type="button" variant="outline" size="sm" (click)="retryFilters()">Try again</button>
+  <span class="text-destructive">
+    {{ filtersActive() ? 'Filters could not be loaded.' : 'PokéAPI could not be reached.' }}
+    Check your connection and try again.
+  </span>
+  <button hlmBtn type="button" variant="outline" size="sm" (click)="retry()">Try again</button>
 </p>
 } @else if (current.status === 'ready' && current.empty) {
 <p role="status" class="text-muted-foreground px-4 pb-4 text-sm">No Pokémon match these filters.</p>

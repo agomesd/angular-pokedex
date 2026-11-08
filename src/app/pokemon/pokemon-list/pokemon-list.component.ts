@@ -3,7 +3,7 @@ import { Component, computed, effect, inject, input, output, PLATFORM_ID, signal
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
-import { catchError, combineLatest, map, of, switchMap } from 'rxjs';
+import { catchError, combineLatest, map, of, startWith, switchMap } from 'rxjs';
 import { PokemonFilters } from '../pokemon-filters/pokemon-filters.component';
 import { PokemonItem } from '../pokemon-item/pokemon-item.component';
 import { PokemonPagination } from '../pokemon-pagination/pokemon-pagination.component';
@@ -33,6 +33,11 @@ type PokemonListView = {
   empty: boolean;
 };
 
+type PageList =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | { status: 'ready'; data: PokemonListResponse };
+
 @Component({
   selector: 'app-pokemon-list',
   templateUrl: './pokemon-list.html',
@@ -58,6 +63,7 @@ export class PokemonList {
       : 'grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3',
   );
   private readonly filterAttempt = signal(0);
+  private readonly listAttempt = signal(0);
 
   constructor() {
     effect(() => {
@@ -81,7 +87,10 @@ export class PokemonList {
   }
 
   protected readonly filtersActive = computed(() => selectionIsActive(this.filters()));
-  protected readonly listCount = computed(() => this.list()?.count ?? null);
+  protected readonly listCount = computed(() => {
+    const list = this.list();
+    return list.status === 'ready' ? list.data.count : null;
+  });
   protected readonly hasNext = computed(() => this.view().hasNext);
   protected readonly lastPage = computed(() => this.view().lastPage);
 
@@ -90,8 +99,12 @@ export class PokemonList {
     this.page.set(1);
   }
 
-  protected retryFilters(): void {
-    this.filterAttempt.update((attempt) => attempt + 1);
+  protected retry(): void {
+    if (this.filtersActive()) {
+      this.filterAttempt.update((attempt) => attempt + 1);
+      return;
+    }
+    this.listAttempt.update((attempt) => attempt + 1);
   }
 
   protected showPokemon(index: number): void {
@@ -112,12 +125,20 @@ export class PokemonList {
   private readonly query = computed(() => ({
     limit: DEFAULT_POKEMON_PAGE_SIZE,
     offset: (this.page() - 1) * DEFAULT_POKEMON_PAGE_SIZE,
+    attempt: this.listAttempt(),
   }));
 
   private readonly list = toSignal(
     toObservable(this.query).pipe(
-      switchMap(({ limit, offset }) => this.pokemonService.list(limit, offset)),
+      switchMap(({ limit, offset }) =>
+        this.pokemonService.list(limit, offset).pipe(
+          map((data) => ({ status: 'ready', data }) satisfies PageList),
+          catchError(() => of({ status: 'error' } satisfies PageList)),
+          startWith({ status: 'loading' } satisfies PageList),
+        ),
+      ),
     ),
+    { initialValue: { status: 'loading' } satisfies PageList },
   );
 
   private readonly filtered = toSignal(
@@ -183,8 +204,10 @@ export class PokemonList {
   });
 }
 
-function unfilteredView(data: PokemonListResponse | undefined, excludeId: number | null): PokemonListView {
-  if (!data) return { status: 'loading', results: [], hasNext: false, lastPage: null, empty: false };
+function unfilteredView(list: PageList, excludeId: number | null): PokemonListView {
+  if (list.status === 'loading') return { status: 'loading', results: [], hasNext: false, lastPage: null, empty: false };
+  if (list.status === 'error') return { status: 'error', results: [], hasNext: false, lastPage: null, empty: false };
+  const data = list.data;
   const results =
     excludeId == null
       ? data.results

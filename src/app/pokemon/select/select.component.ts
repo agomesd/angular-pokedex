@@ -47,7 +47,7 @@ export class Select {
   );
   protected readonly triggerClass = computed(() => {
     if (this.appearance() === 'icon') {
-      return 'inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/70 text-indigo-950 outline-none focus-visible:ring-2 focus-visible:ring-indigo-600 sm:size-8';
+      return 'inline-flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/70 text-indigo-950 outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-8';
     }
     const size = this.size() === 'md' ? 'h-9 px-3 text-sm' : 'h-7 px-2 text-xs';
     return `border-input bg-background flex w-full cursor-pointer items-center gap-2 rounded-md border outline-none focus-visible:ring-2 focus-visible:ring-ring ${size}`;

@@ -27,6 +27,11 @@
               [value]="selection().legendary" (valueChange)="setLegendary($event)" />
           </div>
           <div class="flex min-w-0 flex-col gap-1.5">
+            <label class="text-sm font-medium" for="pokemon-filter-mythical">Mythical</label>
+            <app-select controlId="pokemon-filter-mythical" size="md" [options]="mythicalOptions"
+              [value]="selection().mythical" (valueChange)="setMythical($event)" />
+          </div>
+          <div class="flex min-w-0 flex-col gap-1.5 sm:col-span-2">
             <label class="text-sm font-medium" for="pokemon-filter-team">Team</label>
             <app-select controlId="pokemon-filter-team" size="md" [options]="teamOptions" [value]="selection().team"
               (valueChange)="setTeam($event)" />

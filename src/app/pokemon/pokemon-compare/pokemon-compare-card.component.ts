@@ -141,6 +141,6 @@ export class PokemonCompareCard {
 }
 
 function barTone(delta: number | null): string {
-  if (delta == null || delta === 0) return 'bg-indigo-500';
+  if (delta == null || delta === 0) return 'bg-primary';
   return delta > 0 ? 'bg-emerald-500' : 'bg-rose-500';
 }

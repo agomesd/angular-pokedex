@@ -65,14 +65,18 @@ describe('pokemon filters', () => {
       types: ['grass', 'poison'],
       generation: 'generation-i',
       legendary: false,
+      mythical: false,
     });
     expect(traits('charizard-mega-x')).toEqual({
       types: ['fire', 'dragon'],
       generation: 'generation-i',
       legendary: false,
+      mythical: false,
     });
     expect(traits('moltres')?.legendary).toBe(true);
+    expect(traits('moltres')?.mythical).toBe(false);
     expect(traits('mew')?.legendary).toBe(false);
+    expect(traits('mew')?.mythical).toBe(true);
   });
 
   it('drops unknown, shadow, and stellar types', () => {
@@ -86,6 +90,7 @@ describe('pokemon filters', () => {
       types: ['fire', 'grass'],
       generations: ['generation-i'],
       legendary: 'not-legendary',
+      mythical: 'all',
       team: 'all',
     };
 
@@ -97,9 +102,28 @@ describe('pokemon filters', () => {
   });
 
   it('treats mythicals as not legendary', () => {
-    const legendary: PokemonFilterSelection = { types: [], generations: [], legendary: 'legendary', team: 'all' };
+    const legendary: PokemonFilterSelection = {
+      types: [],
+      generations: [],
+      legendary: 'legendary',
+      mythical: 'all',
+      team: 'all',
+    };
     expect(matchesFilter(traits('moltres'), legendary)).toBe(true);
     expect(matchesFilter(traits('mew'), legendary)).toBe(false);
+  });
+
+  it('filters mythicals separately from legendaries', () => {
+    const mythical: PokemonFilterSelection = {
+      types: [],
+      generations: [],
+      legendary: 'all',
+      mythical: 'mythical',
+      team: 'all',
+    };
+    expect(matchesFilter(traits('mew'), mythical)).toBe(true);
+    expect(matchesFilter(traits('moltres'), mythical)).toBe(false);
+    expect(matchesFilter(traits('bulbasaur'), mythical)).toBe(false);
   });
 
   it('matches team membership only when that filter is set', () => {
