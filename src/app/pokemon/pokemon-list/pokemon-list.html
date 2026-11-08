@@ -17,9 +17,9 @@
 } @else if (current.status === 'ready' && current.empty) {
 <p role="status" class="text-muted-foreground px-4 pb-4 text-sm">No Pokémon match these filters.</p>
 } @else if (current.status === 'ready') {
-<ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+<ul [class]="gridClass()">
   @for (p of current.results; track p.name) {
-  <app-pokemon-item [name]="p.name" />
+  <app-pokemon-item [name]="p.name" [action]="itemAction()" (selected)="pokemonSelected.emit($event)" />
   }
 </ul>
 }

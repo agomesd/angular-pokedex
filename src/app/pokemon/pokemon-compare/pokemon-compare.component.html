@@ -1,0 +1,57 @@
+<article class="mx-auto flex w-full max-w-7xl flex-col gap-4 p-4">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-semibold">Compare</h1>
+    <div class="flex flex-wrap items-center justify-end gap-2">
+      @if (comparedName() && member(); as member) {
+        <button hlmBtn type="button" variant="outline" class="cursor-pointer" (click)="unselect()">Unselect</button>
+        <button hlmBtn type="button" class="cursor-pointer" [disabled]="!canSwap()" (click)="swap(member)">
+          Swap into team
+        </button>
+      }
+      <a hlmBtn variant="outline" class="cursor-pointer" routerLink="/">Back to team</a>
+    </div>
+  </div>
+  @if (comparedName()) {
+    @if (swapHint(); as hint) {
+      <p class="text-muted-foreground text-end text-sm">{{ hint }}</p>
+    } @else if (notice(); as message) {
+      <p role="status" class="text-end text-sm">{{ message }}</p>
+    }
+  }
+
+  @if (!hydrated()) {
+    <p role="status" class="text-muted-foreground text-sm">Loading your team…</p>
+  } @else if (member(); as member) {
+    <div class="grid items-start gap-6 lg:grid-cols-2">
+      <section aria-label="Your Pokémon">
+        <app-pokemon-compare-card
+          label="Your Pokémon"
+          [source]="'' + member.id"
+          [member]="member"
+          [against]="candidatePokemon()"
+          (ready)="teamPokemon.set($event)"
+        />
+      </section>
+
+      <section aria-label="Pokémon to compare">
+        <div [hidden]="comparedName()">
+          @if (notice(); as message) {
+            <p role="status" class="px-4 pt-4 text-sm">{{ message }}</p>
+          }
+          <app-pokemon-list layout="panel" itemAction="select" (pokemonSelected)="choose($event)" />
+        </div>
+
+        @if (comparedName(); as name) {
+          <app-pokemon-compare-card
+            label="Selected Pokémon"
+            [source]="name"
+            [against]="teamPokemon()"
+            (ready)="candidatePokemon.set($event)"
+          />
+        }
+      </section>
+    </div>
+  } @else {
+    <p role="alert" class="text-sm">This Pokémon is not on your team.</p>
+  }
+</article>

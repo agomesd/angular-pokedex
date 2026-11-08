@@ -1,5 +1,5 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
@@ -27,6 +27,8 @@ import { Pokemon, PokemonService, PokemonType } from '../pokemon.service';
 export class PokemonItem {
   private pokemonService = inject(PokemonService);
   readonly name = input.required<string>();
+  readonly action = input<'team' | 'select'>('team');
+  readonly selected = output<Pokemon>();
 
   readonly pokemon = signal<Pokemon | undefined>(undefined);
   readonly pokemonTypes = signal<PokemonType[]>([]);
@@ -37,6 +39,10 @@ export class PokemonItem {
       return icon ? [{ name: entry.type.name, icon }] : [];
     }),
   );
+
+  protected choose(pokemon: Pokemon): void {
+    this.selected.emit(pokemon);
+  }
 
   protected pokemonSprite(pokemon: Pokemon): string | null {
     return (

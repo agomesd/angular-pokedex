@@ -1,20 +1,20 @@
-<nav class="flex shrink-0 items-center gap-1.5 bg-primary rounded-full p-2" aria-label="Pagination">
-  <button hlmBtn variant="outline" type="button" size="icon" class="size-9 rounded-full" aria-label="Skip 10 pages back"
+<nav class="flex shrink-0 items-center gap-1 rounded-full bg-primary p-1.5" aria-label="Pagination">
+  <button hlmBtn variant="outline" type="button" size="icon" class="size-7 rounded-full" aria-label="Skip 10 pages back"
     [disabled]="!canSkipPrevious()" (click)="skipPrevious()">
-    <ng-icon name="lucideArrowBigLeftDash" class="size-5 [&_path]:fill-white [&_path]:stroke-white" />
+    <ng-icon name="lucideArrowBigLeftDash" class="size-4 [&_path]:fill-white [&_path]:stroke-white" />
   </button>
-  <button hlmBtn variant="outline" type="button" size="icon-lg" class="size-14 rounded-full" aria-label="Previous page"
+  <button hlmBtn variant="outline" type="button" size="icon-lg" class="size-11 rounded-full" aria-label="Previous page"
     [disabled]="!canGoPrevious()" (click)="previous()">
-    <ng-icon name="lucideArrowBigLeft" class="size-12 [&_path]:fill-white [&_path]:stroke-white" />
+    <ng-icon name="lucideArrowBigLeft" class="size-9 [&_path]:fill-white [&_path]:stroke-white" />
   </button>
-  <span class="min-w-8 px-1 text-center text-white text-sm font-semibold tabular-nums" aria-current="page"
+  <span class="min-w-7 px-1 text-center text-sm font-semibold text-white tabular-nums" aria-current="page"
     [attr.aria-label]="'Page ' + page()">{{ page() }}</span>
-  <button hlmBtn variant="outline" type="button" size="icon-lg" class="size-14 rounded-full" aria-label="Next page"
+  <button hlmBtn variant="outline" type="button" size="icon-lg" class="size-11 rounded-full" aria-label="Next page"
     [disabled]="!canGoNext()" (click)="next()">
-    <ng-icon name="lucideArrowBigRight" class="size-12 [&_path]:fill-white [&_path]:stroke-white" />
+    <ng-icon name="lucideArrowBigRight" class="size-9 [&_path]:fill-white [&_path]:stroke-white" />
   </button>
-  <button hlmBtn variant="outline" type="button" size="icon" class="size-9 rounded-full"
+  <button hlmBtn variant="outline" type="button" size="icon" class="size-7 rounded-full"
     aria-label="Skip 10 pages forward" [disabled]="!canSkipNext()" (click)="skipNext()">
-    <ng-icon name="lucideArrowBigRightDash" class="size-5 [&_path]:fill-white [&_path]:stroke-white" />
+    <ng-icon name="lucideArrowBigRightDash" class="size-4 [&_path]:fill-white [&_path]:stroke-white" />
   </button>
 </nav>

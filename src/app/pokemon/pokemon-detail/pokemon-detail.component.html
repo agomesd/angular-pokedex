@@ -9,8 +9,10 @@
     <button hlmBtn type="button" variant="outline" class="h-auto min-h-7 w-full py-1 text-center whitespace-normal"
       disabled>Previous Pokémon</button>
     }
-    <a hlmBtn variant="outline" class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal"
-      routerLink="/pokemon" [queryParams]="backToAllQuery()" (click)="backToAll($event)">Back to All</a>
+    <button hlmBtn type="button" variant="outline"
+      class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal" (click)="goBack()">
+      Back
+    </button>
     @if (nextId(); as id) {
     <a hlmBtn variant="outline" class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal"
       [routerLink]="['/pokemon', id]">

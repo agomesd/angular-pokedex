@@ -1,7 +1,7 @@
-import { DecimalPipe, isPlatformBrowser, TitleCasePipe } from '@angular/common';
+import { DecimalPipe, isPlatformBrowser, Location, TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, ElementRef, inject, PLATFORM_ID, signal, viewChild } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Navigation, Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideVolume2 } from '@ng-icons/lucide';
 import { HlmButton } from '@spartan-ng/helm/button';
@@ -20,13 +20,19 @@ import { generationLabel } from '../utils/generation-order';
 import { englishGenus, genderLabel, hatchSteps, pokedexEntry } from '../utils/species-summary';
 import { artworkFrames, GameView, generationViews, GenerationView } from '../utils/sprite-gallery';
 import { typeColour } from '../utils/type-colour';
-import { pageForListIndex } from '../utils/list-page';
-import { listEntryForId, listEntryForName } from '../utils/pokemon-directory';
 
 function pokemonPageId(value: string): number | null {
   if (!/^\d+$/.test(value)) return null;
   const id = Number(value);
   return id > 0 ? id : null;
+}
+
+function hasInAppOrigin(navigation: Navigation | null): boolean {
+  let current = navigation;
+  while (current?.extras.replaceUrl) {
+    current = current.previousNavigation;
+  }
+  return current?.previousNavigation != null;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -59,13 +65,13 @@ type PokemonDetailState =
 export class PokemonDetail {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly location = inject(Location);
   private readonly pokemonService = inject(PokemonService);
   private readonly team = inject(TeamService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly reload = signal(0);
   private readonly cry = viewChild<ElementRef<HTMLAudioElement>>('cry');
   private readonly viewedId = signal<number | null>(null);
-  private readonly listPage = signal<number | null>(null);
   private servedReload = -1;
 
   protected readonly generation = signal<string | null>(null);
@@ -96,11 +102,6 @@ export class PokemonDetail {
   protected readonly nextId = computed(() => {
     const id = this.pageId();
     return id === null ? null : id + 1;
-  });
-
-  protected readonly backToAllQuery = computed(() => {
-    const page = this.listPage();
-    return page !== null && page > 1 ? { page } : {};
   });
 
   private readonly found = computed(() => {
@@ -163,21 +164,6 @@ export class PokemonDetail {
   protected readonly hatchSteps = hatchSteps;
 
   constructor() {
-    effect((onCleanup) => {
-      const pokemon = this.found()?.pokemon;
-      if (!pokemon) {
-        this.listPage.set(null);
-        return;
-      }
-
-      const id = pokemon.id;
-      const request = this.listPageFor(id, pokemon.name).subscribe((page) => {
-        if (this.found()?.pokemon.id !== id) return;
-        this.listPage.set(page);
-      });
-      onCleanup(() => request.unsubscribe());
-    });
-
     effect(() => {
       const id = this.found()?.pokemon.id ?? null;
       if (id === this.viewedId()) return;
@@ -199,22 +185,12 @@ export class PokemonDetail {
     });
   }
 
-  protected backToAll(event: Event): void {
-    if (this.listPage() !== null) return;
-
-    event.preventDefault();
-    const pokemon = this.found()?.pokemon;
-    if (!pokemon) {
-      void this.router.navigate(['/pokemon']);
+  protected goBack(): void {
+    if (this.isBrowser && hasInAppOrigin(this.router.lastSuccessfulNavigation())) {
+      this.location.back();
       return;
     }
-
-    this.listPageFor(pokemon.id, pokemon.name).subscribe((page) => {
-      this.listPage.set(page);
-      void this.router.navigate(['/pokemon'], {
-        queryParams: page > 1 ? { page } : {},
-      });
-    });
+    void this.router.navigate(['/pokemon']);
   }
 
   protected retry(): void {
@@ -269,14 +245,6 @@ export class PokemonDetail {
 
   protected statTotal(pokemon: Pokemon): number {
     return pokemon.stats.reduce((total, stat) => total + stat.base_stat, 0);
-  }
-
-  private listPageFor(id: number, name: string): Observable<number> {
-    return this.pokemonService.directory().pipe(
-      map((entries) => listEntryForId(entries, id) ?? listEntryForName(entries, name)),
-      map((entry) => (entry ? pageForListIndex(entry.index) : 1)),
-      catchError(() => of(1)),
-    );
   }
 
   private pageId(): number | null {

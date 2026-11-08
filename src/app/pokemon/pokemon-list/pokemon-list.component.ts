@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, PLATFORM_ID, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HlmButton } from '@spartan-ng/helm/button';
@@ -7,7 +7,7 @@ import { catchError, combineLatest, map, of, switchMap } from 'rxjs';
 import { PokemonFilters } from '../pokemon-filters/pokemon-filters.component';
 import { PokemonItem } from '../pokemon-item/pokemon-item.component';
 import { PokemonPagination } from '../pokemon-pagination/pokemon-pagination.component';
-import { PokemonService, type PokemonListResponse } from '../pokemon.service';
+import { Pokemon, PokemonService, type PokemonListResponse } from '../pokemon.service';
 import { PokemonSearchComponent } from '../search/pokemon-search.component';
 import { PokemonListEntry } from '../utils/pokemon-directory';
 import { DEFAULT_POKEMON_PAGE_SIZE, listPageQuery, pageForListIndex } from '../utils/list-page';
@@ -45,8 +45,17 @@ export class PokemonList {
   private readonly router = inject(Router);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+  readonly itemAction = input<'team' | 'select'>('team');
+  readonly layout = input<'page' | 'panel'>('page');
+  readonly pokemonSelected = output<Pokemon>();
+
   protected readonly page = signal(listPageQuery(this.route.snapshot.queryParamMap.get('page')));
   protected readonly filters = signal(EMPTY_POKEMON_FILTERS);
+  protected readonly gridClass = computed(() =>
+    this.layout() === 'panel'
+      ? 'grid grid-cols-1 gap-4 p-4 xl:grid-cols-2'
+      : 'grid grid-cols-1 gap-4 p-4 md:grid-cols-2 lg:grid-cols-3',
+  );
   private readonly filterAttempt = signal(0);
 
   constructor() {

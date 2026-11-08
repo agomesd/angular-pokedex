@@ -1,7 +1,7 @@
 import { TitleCasePipe } from '@angular/common';
 import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCross, lucideShield, lucideSword, lucideTrash2 } from '@ng-icons/lucide';
+import { lucideCross, lucideGitCompareArrows, lucideShield, lucideSword, lucideTrash2 } from '@ng-icons/lucide';
 import { BrnTooltip, provideBrnTooltipDefaultOptions } from '@spartan-ng/brain/tooltip';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { RouterLink } from '@angular/router';
@@ -18,7 +18,7 @@ import { TEAM_ROLE_ICON, TEAM_ROLES, TeamRole, TeamService, TeamSlot } from '../
   templateUrl: './team-slot.component.html',
   imports: [TitleCasePipe, RouterLink, PokemonSprite, NgIcon, HlmButton, PokemonDetailSheet, BrnTooltip, PokemonTypeBadge],
   providers: [
-    provideIcons({ lucideTrash2, lucideSword, lucideShield, lucideCross }),
+    provideIcons({ lucideTrash2, lucideSword, lucideShield, lucideCross, lucideGitCompareArrows }),
     provideBrnTooltipDefaultOptions({
       tooltipContentClasses:
         'bg-popover text-popover-foreground z-50 w-max max-w-40 rounded-md px-2 py-1.5 text-xs shadow-md ring-1 ring-foreground/10',

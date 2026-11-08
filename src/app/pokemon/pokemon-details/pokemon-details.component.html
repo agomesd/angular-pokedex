@@ -1,34 +1,31 @@
-<div hlmSheetHeader>
-  <h2 hlmSheetTitle class="text-base">{{ pokemon().name | titlecase }}</h2>
-  <p hlmSheetDescription>#{{ pokemon().id }}</p>
+<div hlmSheetHeader class="pe-14">
+  <h2 hlmSheetTitle class="flex items-baseline gap-2 text-base">
+    <span class="text-xl font-bold tabular-nums">{{ pokemon().id }}</span>
+    {{ pokemon().name | titlecase }}
+  </h2>
 </div>
 <div class="flex flex-col gap-5 px-6 pb-6">
   <div class="grid grid-cols-2 gap-2">
-    <a hlmBtn variant="outline" class="w-full cursor-pointer" [routerLink]="['/pokemon', pokemon().id]">View page</a>
-    <app-add-to-team
-      class="min-w-0 flex-1"
-      [pokemonId]="pokemon().id"
-      [name]="pokemon().name"
-      [sprite]="sprite(pokemon())"
-      [fullWidth]="true"
-      [explainFull]="false"
-      [fullTooltip]="true"
-    />
+    <a hlmBtn variant="outline" class="w-full cursor-pointer" [routerLink]="['/pokemon', pokemon().id]">Show more</a>
+    <app-add-to-team class="min-w-0 flex-1" [pokemonId]="pokemon().id" [name]="pokemon().name"
+      [sprite]="sprite(pokemon())" [fullWidth]="true" [explainFull]="false" [fullTooltip]="true" />
   </div>
 
-  <div class="relative h-40 w-40 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2">
-    @if (sprite(pokemon()); as src) {
+  <div class="flex w-full justify-center rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-4">
+    <div class="relative h-40 w-40">
+      @if (sprite(pokemon()); as src) {
       <app-pokemon-sprite [src]="src" [alt]="pokemon().name | titlecase" />
-    } @else {
-      <span class="text-muted-foreground text-sm">No image</span>
-    }
+      } @else {
+      <span class="text-muted-foreground grid h-full place-items-center text-sm">No image</span>
+      }
+    </div>
   </div>
 
   <div class="flex flex-wrap gap-2">
     @for (entry of pokemon().types; track entry.slot) {
-      @if (typeIcon(entry.type.name); as icon) {
-        <app-pokemon-type-badge [name]="entry.type.name" [icon]="icon" size="sm" />
-      }
+    @if (typeIcon(entry.type.name); as icon) {
+    <app-pokemon-type-badge [name]="entry.type.name" [icon]="icon" size="sm" />
+    }
     }
   </div>
 
@@ -47,12 +44,12 @@
     <h3 class="font-medium">Abilities</h3>
     <ul>
       @for (ability of pokemon().abilities; track ability.ability.name) {
-        <li>
-          {{ ability.ability.name | titlecase }}
-          @if (ability.is_hidden) {
-            <span class="text-muted-foreground">(hidden)</span>
-          }
-        </li>
+      <li>
+        {{ ability.ability.name | titlecase }}
+        @if (ability.is_hidden) {
+        <span class="text-muted-foreground">(hidden)</span>
+        }
+      </li>
       }
     </ul>
   </section>
@@ -61,15 +58,15 @@
     <h3 class="font-medium">Base stats</h3>
     <ul class="flex flex-col gap-2">
       @for (stat of pokemon().stats; track stat.stat.name) {
-        <li>
-          <div class="flex items-center justify-between">
-            <span>{{ statLabel(stat.stat.name) }}</span>
-            <span class="tabular-nums">{{ stat.base_stat }}</span>
-          </div>
-          <div class="bg-muted h-1.5 rounded-full">
-            <div class="h-full rounded-full bg-indigo-500" [style.width.%]="statWidth(stat.base_stat)"></div>
-          </div>
-        </li>
+      <li>
+        <div class="flex items-center justify-between">
+          <span>{{ statLabel(stat.stat.name) }}</span>
+          <span class="tabular-nums">{{ stat.base_stat }}</span>
+        </div>
+        <div class="bg-muted h-1.5 rounded-full">
+          <div class="h-full rounded-full bg-indigo-500" [style.width.%]="statWidth(stat.base_stat)"></div>
+        </div>
+      </li>
       }
     </ul>
   </section>

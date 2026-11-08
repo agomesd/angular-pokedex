@@ -27,6 +27,8 @@ export type TeamAddResult =
   | { ok: true }
   | { ok: false; reason: 'duplicate' | 'full' | 'nickname' | 'role' };
 
+export type TeamReplaceResult = { ok: true } | { ok: false; reason: 'missing' | 'duplicate' };
+
 const STORAGE_KEY = 'pokemon-team';
 
 @Injectable({ providedIn: 'root' })
@@ -34,11 +36,13 @@ export class TeamService {
   private readonly platformId = inject(PLATFORM_ID);
   readonly slots = signal<TeamSlot[]>(emptySlots());
   readonly members = computed(() => this.slots().filter((slot): slot is TeamMember => slot !== null));
+  readonly hydrated = signal(false);
 
   constructor() {
     afterNextRender(() => {
       const stored = this.readStorage();
       if (stored) this.slots.set(stored);
+      this.hydrated.set(true);
     });
   }
 
@@ -84,6 +88,27 @@ export class TeamService {
     const current = this.slots();
     if (!current.some((slot) => slot?.id === id)) return;
     this.save(current.map((slot) => (slot?.id === id ? null : slot)));
+  }
+
+  replace(currentId: number, next: Pick<TeamMember, 'id' | 'name' | 'sprite'>): TeamReplaceResult {
+    const current = this.slots();
+    const index = current.findIndex((slot) => slot?.id === currentId);
+    const member = current[index];
+    if (!member) return { ok: false, reason: 'missing' };
+    if (next.id !== currentId && current.some((slot) => slot?.id === next.id)) {
+      return { ok: false, reason: 'duplicate' };
+    }
+
+    const slots = current.slice();
+    slots[index] = {
+      id: next.id,
+      name: next.name,
+      sprite: next.sprite,
+      nickname: nicknameFor(next.name),
+      role: member.role,
+    };
+    this.save(slots);
+    return { ok: true };
   }
 
   move(from: number, to: number): void {
@@ -176,4 +201,14 @@ export function normalizeNickname(value: string): string | null {
 function legacyNickname(name: string): string {
   const trimmed = name.trim();
   return trimmed.length <= 12 ? trimmed : trimmed.slice(0, 12);
+}
+
+function nicknameFor(name: string): string {
+  const candidates = [name, name.split('-')[0] ?? name];
+  for (const candidate of candidates) {
+    const titled = candidate.charAt(0).toUpperCase() + candidate.slice(1);
+    const nickname = normalizeNickname(titled) ?? normalizeNickname(candidate);
+    if (nickname) return nickname;
+  }
+  return legacyNickname(name);
 }

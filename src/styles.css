@@ -1,90 +1,223 @@
 @layer theme, base, components, utilities;
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/preflight.css' layer(base);
-@import 'tailwindcss/utilities.css';
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
 
 @import "@spartan-ng/brain/hlm-tailwind-preset.css";
 
+/* Pokédex Terminal: dark is the main look, light is a "daylight" variant. */
+
 :root {
-color-scheme: light;
+  color-scheme: light;
 
---font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-display: "Orbitron", "Rajdhani", var(--font-sans);
+  --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
 
---chart-1: oklch(0.646 0.222 41.116);
---chart-2: oklch(0.6 0.118 184.704);
---chart-3: oklch(0.398 0.07 227.392);
---chart-4: oklch(0.828 0.189 84.429);
---chart-5: oklch(0.769 0.188 70.08);
---radius: 0.625rem;
---background: oklch(1 0 0);
---foreground: oklch(0.141 0.005 285.823);
---card: oklch(1 0 0);
---card-foreground: oklch(0.141 0.005 285.823);
---popover: oklch(1 0 0);
---popover-foreground: oklch(0.141 0.005 285.823);
---primary: oklch(0.577 0.245 27.325);
---primary-foreground: oklch(0.985 0 0);
---secondary: oklch(0.967 0.001 286.375);
---secondary-foreground: oklch(0.21 0.006 285.885);
---muted: oklch(0.967 0.001 286.375);
---muted-foreground: oklch(0.552 0.016 285.938);
---accent: oklch(0.967 0.001 286.375);
---accent-foreground: oklch(0.21 0.006 285.885);
---destructive: oklch(0.577 0.245 27.325);
---border: oklch(0.92 0.004 286.32);
---input: oklch(0.92 0.004 286.32);
---ring: oklch(0.705 0.015 286.067);
---sidebar: oklch(0.985 0 0);
---sidebar-foreground: oklch(0.141 0.005 285.823);
---sidebar-primary: oklch(0.21 0.006 285.885);
---sidebar-primary-foreground: oklch(0.985 0 0);
---sidebar-accent: oklch(0.967 0.001 286.375);
---sidebar-accent-foreground: oklch(0.21 0.006 285.885);
---sidebar-border: oklch(0.92 0.004 286.32);
---sidebar-ring: oklch(0.705 0.015 286.067);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+
+  --background: oklch(0.97 0.006 265);
+  --foreground: oklch(0.18 0.02 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.02 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.02 265);
+  --primary: oklch(0.58 0.12 215); /* scanner cyan, darkened for white text */
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.94 0.01 265);
+  --secondary-foreground: oklch(0.25 0.03 265);
+  --muted: oklch(0.94 0.01 265);
+  --muted-foreground: oklch(0.5 0.03 265);
+  --accent: oklch(0.94 0.01 265);
+  --accent-foreground: oklch(0.25 0.03 265);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.89 0.012 265);
+  --input: oklch(0.89 0.012 265);
+  --ring: oklch(0.58 0.12 215);
+  --sidebar: oklch(0.985 0.003 265);
+  --sidebar-foreground: oklch(0.18 0.02 265);
+  --sidebar-primary: oklch(0.58 0.12 215);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.94 0.01 265);
+  --sidebar-accent-foreground: oklch(0.25 0.03 265);
+  --sidebar-border: oklch(0.89 0.012 265);
+  --sidebar-ring: oklch(0.58 0.12 215);
+
+  /* Pokédex shell red (header bar etc.) */
+  --dex-red: oklch(0.6 0.22 22);
+  --dex-red-dark: oklch(0.42 0.16 22);
+  --dex-scan: oklch(0.85 0.13 205);
+
+  /* Pokémon types: fill + text colour that sits on it */
+  --type-normal: #a8a77a;
+  --type-normal-fg: #12130c;
+  --type-fire: #ee8130;
+  --type-fire-fg: #1a0d02;
+  --type-water: #6390f0;
+  --type-water-fg: #040b1f;
+  --type-electric: #f7d02c;
+  --type-electric-fg: #1a1500;
+  --type-grass: #7ac74c;
+  --type-grass-fg: #0a1704;
+  --type-ice: #96d9d6;
+  --type-ice-fg: #04191a;
+  --type-fighting: #c22e28;
+  --type-fighting-fg: #ffffff;
+  --type-poison: #a33ea1;
+  --type-poison-fg: #ffffff;
+  --type-ground: #e2bf65;
+  --type-ground-fg: #1a1403;
+  --type-flying: #a98ff3;
+  --type-flying-fg: #0f0722;
+  --type-psychic: #f95587;
+  --type-psychic-fg: #1f0310;
+  --type-bug: #a6b91a;
+  --type-bug-fg: #121500;
+  --type-rock: #b6a136;
+  --type-rock-fg: #171302;
+  --type-ghost: #735797;
+  --type-ghost-fg: #ffffff;
+  --type-dragon: #6f35fc;
+  --type-dragon-fg: #ffffff;
+  --type-dark: #705746;
+  --type-dark-fg: #ffffff;
+  --type-steel: #b7b7ce;
+  --type-steel-fg: #0c0c14;
+  --type-fairy: #d685ad;
+  --type-fairy-fg: #1d0713;
 }
 
 :root.dark {
-color-scheme: dark;
+  color-scheme: dark;
 
---chart-1: oklch(0.488 0.243 264.376);
---chart-2: oklch(0.696 0.17 162.48);
---chart-3: oklch(0.769 0.188 70.08);
---chart-4: oklch(0.627 0.265 303.9);
---chart-5: oklch(0.645 0.246 16.439);
---background: oklch(0.141 0.005 285.823);
---foreground: oklch(0.985 0 0);
---card: oklch(0.21 0.006 285.885);
---card-foreground: oklch(0.985 0 0);
---popover: oklch(0.21 0.006 285.885);
---popover-foreground: oklch(0.985 0 0);
---primary: oklch(0.577 0.245 27.325);
---primary-foreground: oklch(0.985 0 0);
---secondary: oklch(0.274 0.006 286.033);
---secondary-foreground: oklch(0.985 0 0);
---muted: oklch(0.274 0.006 286.033);
---muted-foreground: oklch(0.705 0.015 286.067);
---accent: oklch(0.274 0.006 286.033);
---accent-foreground: oklch(0.985 0 0);
---destructive: oklch(0.704 0.191 22.216);
---border: oklch(1 0 0 / 10%);
---input: oklch(1 0 0 / 15%);
---ring: oklch(0.552 0.016 285.938);
---sidebar: oklch(0.21 0.006 285.885);
---sidebar-foreground: oklch(0.985 0 0);
---sidebar-primary: oklch(0.985 0 0);
---sidebar-primary-foreground: oklch(0.21 0.006 285.885);
---sidebar-accent: oklch(0.274 0.006 286.033);
---sidebar-accent-foreground: oklch(0.985 0 0);
---sidebar-border: oklch(1 0 0 / 10%);
---sidebar-ring: oklch(0.552 0.016 285.938);
+  --chart-1: oklch(0.85 0.13 205);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+
+  --background: oklch(0.16 0.012 265);
+  --foreground: oklch(0.94 0.01 265);
+  --card: oklch(0.2 0.02 265);
+  --card-foreground: oklch(0.94 0.01 265);
+  --popover: oklch(0.2 0.02 265);
+  --popover-foreground: oklch(0.94 0.01 265);
+  --primary: oklch(0.85 0.13 205); /* scanner cyan */
+  --primary-foreground: oklch(0.15 0.02 220);
+  --secondary: oklch(0.25 0.025 265);
+  --secondary-foreground: oklch(0.94 0.01 265);
+  --muted: oklch(0.25 0.025 265);
+  --muted-foreground: oklch(0.69 0.03 265);
+  --accent: oklch(0.27 0.03 265);
+  --accent-foreground: oklch(0.94 0.01 265);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(0.32 0.03 265);
+  --input: oklch(0.32 0.03 265);
+  --ring: oklch(0.85 0.13 205);
+  --sidebar: oklch(0.2 0.02 265);
+  --sidebar-foreground: oklch(0.94 0.01 265);
+  --sidebar-primary: oklch(0.85 0.13 205);
+  --sidebar-primary-foreground: oklch(0.15 0.02 220);
+  --sidebar-accent: oklch(0.27 0.03 265);
+  --sidebar-accent-foreground: oklch(0.94 0.01 265);
+  --sidebar-border: oklch(0.32 0.03 265);
+  --sidebar-ring: oklch(0.85 0.13 205);
+}
+
+/* Exposes the extra tokens as utilities:
+   bg-dex-red, text-dex-scan, bg-type-fire, text-type-fire-fg, font-display, font-mono */
+@theme inline {
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+
+  --color-dex-red: var(--dex-red);
+  --color-dex-red-dark: var(--dex-red-dark);
+  --color-dex-scan: var(--dex-scan);
+
+  --color-type-normal: var(--type-normal);
+  --color-type-normal-fg: var(--type-normal-fg);
+  --color-type-fire: var(--type-fire);
+  --color-type-fire-fg: var(--type-fire-fg);
+  --color-type-water: var(--type-water);
+  --color-type-water-fg: var(--type-water-fg);
+  --color-type-electric: var(--type-electric);
+  --color-type-electric-fg: var(--type-electric-fg);
+  --color-type-grass: var(--type-grass);
+  --color-type-grass-fg: var(--type-grass-fg);
+  --color-type-ice: var(--type-ice);
+  --color-type-ice-fg: var(--type-ice-fg);
+  --color-type-fighting: var(--type-fighting);
+  --color-type-fighting-fg: var(--type-fighting-fg);
+  --color-type-poison: var(--type-poison);
+  --color-type-poison-fg: var(--type-poison-fg);
+  --color-type-ground: var(--type-ground);
+  --color-type-ground-fg: var(--type-ground-fg);
+  --color-type-flying: var(--type-flying);
+  --color-type-flying-fg: var(--type-flying-fg);
+  --color-type-psychic: var(--type-psychic);
+  --color-type-psychic-fg: var(--type-psychic-fg);
+  --color-type-bug: var(--type-bug);
+  --color-type-bug-fg: var(--type-bug-fg);
+  --color-type-rock: var(--type-rock);
+  --color-type-rock-fg: var(--type-rock-fg);
+  --color-type-ghost: var(--type-ghost);
+  --color-type-ghost-fg: var(--type-ghost-fg);
+  --color-type-dragon: var(--type-dragon);
+  --color-type-dragon-fg: var(--type-dragon-fg);
+  --color-type-dark: var(--type-dark);
+  --color-type-dark-fg: var(--type-dark-fg);
+  --color-type-steel: var(--type-steel);
+  --color-type-steel-fg: var(--type-steel-fg);
+  --color-type-fairy: var(--type-fairy);
+  --color-type-fairy-fg: var(--type-fairy-fg);
+}
+
+/* Glow helpers: use sparingly (hover, focus, header) */
+@utility glow-scan {
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--dex-scan) 55%, transparent),
+    0 0 12px color-mix(in oklch, var(--dex-scan) 35%, transparent);
+}
+
+@utility glow-red {
+  box-shadow:
+    0 0 0 1px var(--dex-red-dark),
+    0 0 14px color-mix(in oklch, var(--dex-red) 40%, transparent);
+}
+
+/* Pokédex camera lens light */
+@utility dex-lens {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at 35% 35%,
+    oklch(0.95 0.05 205),
+    var(--dex-scan) 55%,
+    oklch(0.6 0.1 210)
+  );
+  box-shadow: 0 0 10px var(--dex-scan);
 }
 
 @layer base {
-* {
-@apply border-border outline-ring/50;
-}
-body {
-@apply bg-background text-foreground;
-}
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+  }
 }

@@ -1,10 +1,10 @@
-<div class="flex shrink-0 items-center rounded-full bg-primary p-2">
-  <button hlmBtn type="button" variant="outline" class="relative size-14 rounded-full"
-    style="--ng-icon__size: 1.5rem; --ng-icon__stroke-width: 2.5" aria-label="Filter Pokémon"
+<div class="flex shrink-0 items-center rounded-full bg-primary p-1.5">
+  <button hlmBtn type="button" variant="outline" class="relative size-11 rounded-full"
+    style="--ng-icon__size: 1.25rem; --ng-icon__stroke-width: 2.5" aria-label="Filter Pokémon"
     [attr.aria-pressed]="filtersActive()" (click)="open()">
     <ng-icon name="lucideFunnel" class="text-white [&_path]:fill-none [&_path]:stroke-white" />
     @if (filtersActive()) {
-    <span class="bg-primary absolute top-2 right-2 size-2.5 rounded-full ring-2 ring-background"></span>
+    <span class="bg-primary absolute top-1.5 right-1.5 size-2 rounded-full ring-2 ring-background"></span>
     }
   </button>
 </div>

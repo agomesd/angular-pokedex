@@ -1,0 +1,123 @@
+<article class="bg-card flex flex-col gap-5 rounded-2xl border p-4">
+  @if (state(); as detail) {
+    @if (detail.status === 'loading') {
+      <p role="status" class="text-muted-foreground text-sm">Loading Pokémon…</p>
+    }
+    @if (detail.status === 'not-found') {
+      <p role="alert" class="text-destructive text-sm">No Pokémon matches this comparison.</p>
+    }
+    @if (detail.status === 'error') {
+      <div role="alert" class="flex flex-col items-start gap-2">
+        <p class="text-destructive text-sm">PokéAPI could not be reached. Check your connection and try again.</p>
+        <button hlmBtn type="button" variant="outline" size="sm" (click)="retry()">Try again</button>
+      </div>
+    }
+    @if (detail.status === 'found') {
+      <header class="flex flex-col gap-1">
+        <p class="text-muted-foreground text-sm">{{ label() }}</p>
+        @if (member(); as member) {
+          <h2 class="text-xl font-semibold">{{ member.nickname }}</h2>
+          <p class="text-muted-foreground text-sm">
+            {{ member.role }} · {{ detail.pokemon.name | titlecase }} · #{{ detail.pokemon.id }}
+          </p>
+        } @else {
+          <h2 class="text-xl font-semibold">{{ detail.pokemon.name | titlecase }}</h2>
+          <p class="text-muted-foreground text-sm">#{{ detail.pokemon.id }}</p>
+        }
+      </header>
+
+      <div class="relative h-40 w-40 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2">
+        @if (sprite(detail.pokemon); as src) {
+          <app-pokemon-sprite [src]="src" [alt]="detail.pokemon.name | titlecase" />
+        } @else {
+          <span class="text-muted-foreground text-sm">No image</span>
+        }
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        @for (entry of detail.pokemon.types; track entry.slot) {
+          @if (typeIcon(detail.types, entry.type.name); as icon) {
+            <app-pokemon-type-badge [name]="entry.type.name" [icon]="icon" size="sm" />
+          }
+        }
+      </div>
+
+      <dl class="grid grid-cols-2 gap-3">
+        <div>
+          <dt class="text-muted-foreground">Height</dt>
+          <dd class="font-medium">{{ heightInMetres(detail.pokemon.height) }}</dd>
+        </div>
+        <div>
+          <dt class="text-muted-foreground">Weight</dt>
+          <dd class="font-medium">{{ weightInKilograms(detail.pokemon.weight) }}</dd>
+        </div>
+      </dl>
+
+      <section class="flex flex-col gap-1">
+        <h3 class="font-medium">Abilities</h3>
+        <ul>
+          @for (ability of detail.pokemon.abilities; track ability.ability.name) {
+            <li>
+              {{ ability.ability.name.split('-').join(' ') | titlecase }}
+              @if (ability.is_hidden) {
+                <span class="text-muted-foreground">(hidden)</span>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="font-medium">Base stats</h3>
+          <span class="tabular-nums">
+            @if (totalDelta(detail.pokemon); as delta) {
+              <span
+                class="me-2 text-xs font-medium"
+                [class.text-emerald-600]="delta > 0"
+                [class.text-rose-600]="delta < 0"
+              >
+                {{ delta > 0 ? '+' + delta : delta }}
+              </span>
+            }
+            Total {{ total(detail.pokemon) }}
+          </span>
+        </div>
+        @if (against()) {
+          <p class="text-muted-foreground text-xs">Green bars are higher. Red bars are lower.</p>
+        }
+        <ul class="flex flex-col gap-2">
+          @for (stat of detail.pokemon.stats; track stat.stat.name) {
+            <li>
+              <div class="flex items-center justify-between gap-2">
+                <span>{{ statLabel(stat.stat.name) }}</span>
+                <span class="tabular-nums">
+                  @if (comparison(stat.stat.name, stat.base_stat).delta; as delta) {
+                    <span
+                      class="me-2 text-xs font-medium"
+                      [class.text-emerald-600]="delta > 0"
+                      [class.text-rose-600]="delta < 0"
+                    >
+                      {{ delta > 0 ? '+' + delta : delta }}
+                    </span>
+                  }
+                  {{ stat.base_stat }}
+                </span>
+              </div>
+              <div class="bg-muted h-1.5 rounded-full">
+                <div
+                  class="h-full rounded-full {{ comparison(stat.stat.name, stat.base_stat).tone }}"
+                  [style.width.%]="comparison(stat.stat.name, stat.base_stat).width"
+                ></div>
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <a hlmBtn variant="outline" size="sm" class="w-fit cursor-pointer" [routerLink]="['/pokemon', detail.pokemon.id]">
+        Show more
+      </a>
+    }
+  }
+</article>

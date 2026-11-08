@@ -79,13 +79,17 @@
     </ul>
   }
 </div>
-<div class="absolute right-0 bottom-0 z-10 flex items-center gap-2 rounded-tl-3xl bg-white/70 p-2" role="group"
+<div class="absolute right-0 bottom-0 z-10 flex max-w-full flex-wrap items-center justify-end gap-2 rounded-tl-3xl bg-white/70 p-2" role="group"
   [attr.aria-label]="(member.name | titlecase) + ' actions'" (pointerdown)="$event.stopPropagation()"
   (dragstart)="$event.preventDefault(); $event.stopPropagation()">
   <button hlmBtn type="button" variant="outline" size="icon-sm" class="cursor-pointer rounded-xl"
     [attr.aria-label]="'Remove ' + (member.name | titlecase) + ' from team'" (click)="remove.emit(member.id)">
     <ng-icon name="lucideTrash2" />
   </button>
+  <a hlmBtn variant="outline" size="icon-sm" class="cursor-pointer rounded-xl" [routerLink]="['/compare', member.id]"
+    [attr.aria-label]="'Compare ' + (member.name | titlecase)">
+    <ng-icon name="lucideGitCompareArrows" />
+  </a>
   <app-pokemon-detail-sheet trigger="icon" [pokemonId]="member.id" [name]="member.name" />
 </div>
 } @else {

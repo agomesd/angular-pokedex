@@ -28,17 +28,23 @@
   </div>
   <div hlmCardFooter class="flex w-full flex-row items-center gap-2">
     @if (pokemon(); as p) {
-      <app-add-to-team
-        class="min-w-0 flex-1"
-        [pokemonId]="p.id"
-        [name]="p.name"
-        [sprite]="pokemonSprite(p)"
-        [fullWidth]="true"
-        [explainFull]="false"
-        [fullTooltip]="true"
-      />
+      @if (action() === 'select') {
+        <button hlmBtn type="button" class="min-w-0 flex-1 cursor-pointer" (click)="choose(p)">Compare</button>
+      } @else {
+        <app-add-to-team
+          class="min-w-0 flex-1"
+          [pokemonId]="p.id"
+          [name]="p.name"
+          [sprite]="pokemonSprite(p)"
+          [fullWidth]="true"
+          [explainFull]="false"
+          [fullTooltip]="true"
+        />
+      }
     } @else {
-      <button hlmBtn type="button" class="min-w-0 flex-1" disabled>Add to team</button>
+      <button hlmBtn type="button" class="min-w-0 flex-1" disabled>
+        {{ action() === 'select' ? 'Compare' : 'Add to team' }}
+      </button>
     }
     <app-pokemon-detail-sheet [pokemon]="pokemon() ?? null" [types]="pokemonTypes()" [name]="name()" />
   </div>
