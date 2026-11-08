@@ -1,9 +1,10 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, Injector, PLATFORM_ID, afterNextRender, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, Injector, PLATFORM_ID, afterNextRender, computed, inject, signal } from '@angular/core';
 import { TeamSlotComponent } from '../pokemon/team/team-slot/team-slot.component';
 import { TEAM_LIMIT, TeamService } from '../pokemon/team/team.service';
 
-const COLUMNS = 3;
+const TWO_COLUMN_QUERY = '(min-width: 30rem)';
+const THREE_COLUMN_QUERY = '(min-width: 40rem)';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,7 +14,25 @@ const COLUMNS = 3;
 export class DashboardComponent {
   private readonly team = inject(TeamService);
   private readonly injector = inject(Injector);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly columns = signal(3);
+
+  constructor() {
+    if (!this.isBrowser) return;
+    afterNextRender(() => {
+      const two = window.matchMedia(TWO_COLUMN_QUERY);
+      const three = window.matchMedia(THREE_COLUMN_QUERY);
+      const update = () => this.columns.set(three.matches ? 3 : two.matches ? 2 : 1);
+      update();
+      two.addEventListener('change', update);
+      three.addEventListener('change', update);
+      this.destroyRef.onDestroy(() => {
+        two.removeEventListener('change', update);
+        three.removeEventListener('change', update);
+      });
+    }, { injector: this.injector });
+  }
 
   protected readonly slots = this.team.slots;
   protected readonly teamEmpty = computed(() => this.team.hydrated() && this.team.members().length === 0);
@@ -98,7 +117,7 @@ export class DashboardComponent {
   }
 
   protected onKeydown(index: number, event: KeyboardEvent): void {
-    const target = neighbor(index, event.key);
+    const target = neighbor(index, event.key, this.columns());
     if (target === null || !this.slots()[index]) return;
     event.preventDefault();
     this.team.move(index, target);
@@ -121,11 +140,11 @@ export class DashboardComponent {
   }
 }
 
-function neighbor(index: number, key: string): number | null {
-  if (key === 'ArrowLeft') return index % COLUMNS === 0 ? null : index - 1;
-  if (key === 'ArrowRight') return index % COLUMNS === COLUMNS - 1 ? null : index + 1;
-  if (key === 'ArrowUp') return index - COLUMNS >= 0 ? index - COLUMNS : null;
-  if (key === 'ArrowDown') return index + COLUMNS < TEAM_LIMIT ? index + COLUMNS : null;
+function neighbor(index: number, key: string, columns: number): number | null {
+  if (key === 'ArrowLeft') return index % columns === 0 ? null : index - 1;
+  if (key === 'ArrowRight') return index % columns === columns - 1 ? null : index + 1;
+  if (key === 'ArrowUp') return index - columns >= 0 ? index - columns : null;
+  if (key === 'ArrowDown') return index + columns < TEAM_LIMIT ? index + columns : null;
   return null;
 }
 

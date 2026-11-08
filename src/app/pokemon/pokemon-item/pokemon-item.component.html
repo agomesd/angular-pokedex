@@ -9,7 +9,7 @@
         </span>
         <h3 hlmCardTitle class="truncate">{{ name() | titlecase }}</h3>
       </div>
-      <div class="flex h-8 w-[4.25rem] shrink-0 items-center justify-end gap-1">
+      <div class="flex h-8 w-17 shrink-0 items-center justify-end gap-1">
         @for (type of typeBadges(); track type.name) {
           <app-pokemon-type-badge [name]="type.name" [icon]="type.icon" />
         }

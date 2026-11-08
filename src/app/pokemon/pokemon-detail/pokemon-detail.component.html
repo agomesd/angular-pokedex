@@ -2,7 +2,7 @@
   <nav class="grid grid-cols-3 gap-2" aria-label="Pokémon pages">
     @if (previousId(); as id) {
     <a hlmBtn variant="outline" class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal"
-      [routerLink]="['/pokemon', id]">
+      [routerLink]="['/pokemon', id]" [replaceUrl]="true">
       Previous Pokémon
     </a>
     } @else {
@@ -15,7 +15,7 @@
     </button>
     @if (nextId(); as id) {
     <a hlmBtn variant="outline" class="h-auto min-h-7 w-full cursor-pointer py-1 text-center whitespace-normal"
-      [routerLink]="['/pokemon', id]">
+      [routerLink]="['/pokemon', id]" [replaceUrl]="true">
       Next Pokémon
     </a>
     } @else {

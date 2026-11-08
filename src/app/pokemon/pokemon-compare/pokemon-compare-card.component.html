@@ -1,4 +1,8 @@
-<article class="bg-card flex flex-col gap-5 rounded-2xl border p-4">
+<article
+  class="bg-card flex flex-col gap-5 rounded-2xl border p-4"
+  [class.max-lg:gap-3]="summary()"
+  [class.max-lg:p-3]="summary()"
+>
   @if (state(); as detail) {
     @if (detail.status === 'loading') {
       <p role="status" class="text-muted-foreground text-sm">Loading Pokémon…</p>
@@ -13,35 +17,50 @@
       </div>
     }
     @if (detail.status === 'found') {
-      <header class="flex flex-col gap-1">
-        <p class="text-muted-foreground text-sm">{{ label() }}</p>
-        @if (member(); as member) {
-          <h2 class="text-xl font-semibold">{{ member.nickname }}</h2>
-          <p class="text-muted-foreground text-sm">
-            {{ member.role }} · {{ detail.pokemon.name | titlecase }} · #{{ detail.pokemon.id }}
-          </p>
-        } @else {
-          <h2 class="text-xl font-semibold">{{ detail.pokemon.name | titlecase }}</h2>
-          <p class="text-muted-foreground text-sm">#{{ detail.pokemon.id }}</p>
-        }
-      </header>
-
-      <div class="relative h-40 w-40 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2">
-        @if (sprite(detail.pokemon); as src) {
-          <app-pokemon-sprite [src]="src" [alt]="detail.pokemon.name | titlecase" />
-        } @else {
-          <span class="text-muted-foreground text-sm">No image</span>
-        }
-      </div>
-
-      <div class="flex flex-wrap gap-2">
-        @for (entry of detail.pokemon.types; track entry.slot) {
-          @if (typeIcon(detail.types, entry.type.name); as icon) {
-            <app-pokemon-type-badge [name]="entry.type.name" [icon]="icon" size="sm" />
+      <div
+        class="grid grid-cols-1 items-start gap-5"
+        [class.max-lg:grid-cols-[6rem_minmax(0,1fr)]]="summary()"
+        [class.max-lg:items-center]="summary()"
+        [class.max-lg:gap-x-3]="summary()"
+        [class.max-lg:gap-y-1]="summary()"
+      >
+        <header class="flex flex-col gap-1" [class.max-lg:col-start-2]="summary()" [class.max-lg:row-start-1]="summary()">
+          <p class="text-muted-foreground text-sm">{{ label() }}</p>
+          @if (member(); as member) {
+            <h2 class="text-xl font-semibold">{{ member.nickname }}</h2>
+            <p class="text-muted-foreground text-sm">
+              {{ member.role }} · {{ detail.pokemon.name | titlecase }} · #{{ detail.pokemon.id }}
+            </p>
+          } @else {
+            <h2 class="text-xl font-semibold">{{ detail.pokemon.name | titlecase }}</h2>
+            <p class="text-muted-foreground text-sm">#{{ detail.pokemon.id }}</p>
           }
-        }
+        </header>
+
+        <div
+          class="relative size-40 rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center p-2"
+          [class.max-lg:col-start-1]="summary()"
+          [class.max-lg:row-span-2]="summary()"
+          [class.max-lg:row-start-1]="summary()"
+          [class.max-lg:size-24]="summary()"
+        >
+          @if (sprite(detail.pokemon); as src) {
+            <app-pokemon-sprite [src]="src" [alt]="detail.pokemon.name | titlecase" />
+          } @else {
+            <span class="text-muted-foreground text-sm">No image</span>
+          }
+        </div>
+
+        <div class="flex flex-wrap gap-2" [class.max-lg:col-start-2]="summary()" [class.max-lg:row-start-2]="summary()">
+          @for (entry of detail.pokemon.types; track entry.slot) {
+            @if (typeIcon(detail.types, entry.type.name); as icon) {
+              <app-pokemon-type-badge [name]="entry.type.name" [icon]="icon" size="sm" />
+            }
+          }
+        </div>
       </div>
 
+      <div class="flex flex-col gap-5" [class.max-lg:hidden]="summary()">
       <dl class="grid grid-cols-2 gap-3">
         <div>
           <dt class="text-muted-foreground">Height</dt>
@@ -129,6 +148,7 @@
       <a hlmBtn variant="outline" size="sm" class="w-fit cursor-pointer" [routerLink]="['/pokemon', detail.pokemon.id]">
         Show more
       </a>
+      </div>
     }
   }
 </article>

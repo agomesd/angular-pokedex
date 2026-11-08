@@ -35,7 +35,7 @@ import { isTeamRole, TEAM_ROLE_ICON, TEAM_ROLES, TeamService, TeamSlot } from '.
   providers: [provideIcons({ lucideTrash2, lucideGitCompareArrows, lucidePencil })],
   host: {
     class:
-      "relative aspect-square rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center",
+      "relative aspect-[3/2] rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center min-[30rem]:aspect-square",
     '[class.z-20]': 'roleMenuOpen()',
     '[class.opacity-60]': 'dragging()',
     '[class.ring-2]': 'dropTarget()',

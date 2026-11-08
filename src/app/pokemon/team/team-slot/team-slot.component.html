@@ -44,15 +44,12 @@
   (pointermove)="pointerMoved.emit($event)" (pointerup)="pointerReleased.emit($event)"
   (pointercancel)="pointerCancelled.emit($event)" (keydown)="reorderKey.emit($event)">
   @if (member.sprite; as src) {
-  <span class="relative size-16 sm:size-28">
+  <span class="relative size-28 min-[30rem]:size-20 sm:size-28">
     <app-pokemon-sprite [src]="src" [alt]="member.name | titlecase" />
   </span>
   } @else {
-  <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 sm:size-24" />
+  <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-24 min-[30rem]:size-20 sm:size-24" />
   }
-  <span class="max-w-full truncate rounded-full bg-white/70 px-2 py-0.5 text-xs font-medium text-indigo-950">
-    {{ member.name | titlecase }}
-  </span>
 </div>
 <app-select class="absolute top-2 right-3 z-20" appearance="icon" [controlId]="'team-slot-role-' + index()"
   [options]="roleOptions" [value]="member.role" [ariaLabel]="'Change role, currently ' + member.role"
@@ -76,6 +73,6 @@
 <a routerLink="/pokemon"
   class="flex h-full cursor-pointer items-center justify-center rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-ring"
   [attr.aria-label]="'Open Pokédex, slot ' + (index() + 1)">
-  <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-16 opacity-80 sm:size-24" />
+  <img src="/pokeball.png" alt="" width="96" height="96" draggable="false" class="size-24 min-[30rem]:size-20 opacity-80 sm:size-24" />
 </a>
 }

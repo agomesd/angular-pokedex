@@ -53,6 +53,7 @@
           [source]="'' + member.id"
           [member]="member"
           [against]="candidatePokemon()"
+          [summary]="!comparedName()"
           (ready)="teamPokemon.set($event)"
         />
       </section>

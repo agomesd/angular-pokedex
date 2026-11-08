@@ -56,6 +56,7 @@ export class PokemonCompareCard {
   readonly source = input.required<string>();
   readonly member = input<TeamMember | null>(null);
   readonly against = input<Pokemon | null>(null);
+  readonly summary = input(false);
   readonly ready = output<Pokemon>();
 
   protected readonly state = signal<CompareCardState>({ status: 'loading' });

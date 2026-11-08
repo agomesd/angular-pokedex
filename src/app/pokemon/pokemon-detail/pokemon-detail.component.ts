@@ -27,12 +27,19 @@ function pokemonPageId(value: string): number | null {
   return id > 0 ? id : null;
 }
 
-function hasInAppOrigin(navigation: Navigation | null): boolean {
+function isPokemonDetailUrl(url: string): boolean {
+  const path = url.split(/[?#]/)[0];
+  return /^\/pokemon\/[^/]+$/.test(path);
+}
+
+function returnToUrl(navigation: Navigation | null): string | null {
   let current = navigation;
-  while (current?.extras.replaceUrl) {
+  while (current) {
+    const url = current.finalUrl?.toString() ?? '';
+    if (!isPokemonDetailUrl(url)) return url || '/';
     current = current.previousNavigation;
   }
-  return current?.previousNavigation != null;
+  return null;
 }
 
 const STAT_LABELS: Record<string, string> = {
@@ -69,6 +76,9 @@ export class PokemonDetail {
   private readonly pokemonService = inject(PokemonService);
   private readonly team = inject(TeamService);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly returnTo = returnToUrl(
+    this.isBrowser ? this.router.currentNavigation() ?? this.router.lastSuccessfulNavigation() : null,
+  );
   private readonly reload = signal(0);
   private readonly cry = viewChild<ElementRef<HTMLAudioElement>>('cry');
   private readonly viewedId = signal<number | null>(null);
@@ -186,7 +196,7 @@ export class PokemonDetail {
   }
 
   protected goBack(): void {
-    if (this.isBrowser && hasInAppOrigin(this.router.lastSuccessfulNavigation())) {
+    if (this.isBrowser && this.returnTo) {
       this.location.back();
       return;
     }
