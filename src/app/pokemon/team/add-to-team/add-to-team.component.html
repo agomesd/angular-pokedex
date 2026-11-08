@@ -51,6 +51,7 @@
           <app-team-member-form
             [id]="'team-' + pokemonId()"
             submitLabel="Add to team"
+            [nickname]="suggestedNickname(name())"
             [error]="addError()"
             (submitted)="submit($event)"
           />

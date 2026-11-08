@@ -5,7 +5,7 @@ import { BrnTooltip, provideBrnTooltipDefaultOptions } from '@spartan-ng/brain/t
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { TeamMemberForm, TeamMemberFormValue } from '../team-member-form/team-member-form.component';
-import { TEAM_LIMIT, TeamService, isTeamRole } from '../team.service';
+import { TEAM_LIMIT, TeamService, isTeamRole, suggestedNickname } from '../team.service';
 
 @Component({
   selector: 'app-add-to-team',
@@ -37,6 +37,7 @@ export class AddToTeam {
   protected readonly onTeam = computed(() => this.team.has(this.pokemonId()));
   protected readonly teamFull = computed(() => !this.onTeam() && this.team.members().length >= TEAM_LIMIT);
   protected readonly addError = signal<string | null>(null);
+  protected readonly suggestedNickname = suggestedNickname;
 
   protected onDialogState(state: string): void {
     if (state !== 'open') return;
