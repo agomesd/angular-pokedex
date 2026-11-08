@@ -32,7 +32,7 @@ Feature UI lives under `src/app/pokemon`. Routes are in `src/app/app.routes.ts`.
 - `PokemonService` is the only place that talks to PokéAPI. Detail and type requests are cached in memory with `shareReplay`, and a failed request is dropped from the cache so Try again can fetch it again. The browse list asks for one page of 20. Cards then load that page's details. The full directory is fetched only when search, filters, or paging need it.
 - `TeamService` holds the team in signals. The team is written to `localStorage` after the browser has hydrated, so the server render and the first client render agree.
 - Search is an RxJS pipeline in `pokemon-search.ts`. `debounceTime(300)`, `distinctUntilChanged`, and `switchMap` mean a new query cancels the one still in flight. An empty query never calls the API. A 404 and a network failure are different results.
-- There is no global store. Page, filters, and the open dialog are component state. The team and the Pokémon cache are the two shared services.
+- The list page and filters are written to the URL (`page`, `types`, `generations`, `legendary`, `mythical`, `team`) and remembered for the browser session. Leaving the Pokédex and opening it again keeps that page and those filters. The compare list remembers its own browse, separate from the Pokédex. Dialogs stay component state. The team and the Pokémon cache are shared services.
 
 ## Why Tailwind and Spartan
 

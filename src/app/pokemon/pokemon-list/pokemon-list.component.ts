@@ -19,7 +19,9 @@ import {
   selectionIsActive,
   type PokemonFilterSelection,
 } from '../utils/pokemon-filters';
+import { browseQuery, browseQueryMatches, filtersFromQuery, hasBrowseQuery } from '../utils/pokemon-list-query';
 import { TeamService } from '../team/team.service';
+import { PokemonListState } from './pokemon-list-state';
 
 type FilteredDirectory =
   | { status: 'idle' | 'error' }
@@ -48,15 +50,18 @@ export class PokemonList {
   private readonly team = inject(TeamService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly listState = inject(PokemonListState);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly browseKey = this.route.snapshot.routeConfig?.path?.startsWith('compare') ? 'compare' : 'pokemon';
+  private readonly initialBrowse = this.browseFromRoute();
 
   readonly itemAction = input<'team' | 'select'>('team');
   readonly layout = input<'page' | 'panel'>('page');
   readonly excludeId = input<number | null>(null);
   readonly pokemonSelected = output<Pokemon>();
 
-  protected readonly page = signal(listPageQuery(this.route.snapshot.queryParamMap.get('page')));
-  protected readonly filters = signal(EMPTY_POKEMON_FILTERS);
+  protected readonly page = signal(this.initialBrowse.page);
+  protected readonly filters = signal(this.initialBrowse.filters);
   protected readonly gridClass = computed(() =>
     this.layout() === 'panel'
       ? 'grid grid-cols-1 gap-4 p-4 xl:grid-cols-2'
@@ -69,11 +74,13 @@ export class PokemonList {
     effect(() => {
       if (!this.isBrowser) return;
       const page = this.page();
-      const current = listPageQuery(this.route.snapshot.queryParamMap.get('page'));
-      if (current === page) return;
+      const filters = this.filters();
+      const next = browseQuery(page, filters);
+      this.listState.write(this.browseKey, { page, filters });
+      if (browseQueryMatches(this.route.snapshot.queryParamMap, next)) return;
       void this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { page: page > 1 ? page : null },
+        queryParams: next,
         queryParamsHandling: 'merge',
         replaceUrl: true,
       });
@@ -105,6 +112,16 @@ export class PokemonList {
       return;
     }
     this.listAttempt.update((attempt) => attempt + 1);
+  }
+
+  private browseFromRoute(): { page: number; filters: PokemonFilterSelection } {
+    const params = this.route.snapshot.queryParamMap;
+    if (hasBrowseQuery(params)) return { page: listPageQuery(params.get('page')), filters: filtersFromQuery(params) };
+    // The first navigation is hydrated from the URL. A later visit to a bare
+    // /pokemon link restores the browse remembered during this browser session.
+    const navigationId = this.router.currentNavigation()?.id ?? this.router.lastSuccessfulNavigation()?.id ?? 1;
+    if (navigationId === 1) return { page: 1, filters: EMPTY_POKEMON_FILTERS };
+    return this.listState.read(this.browseKey) ?? { page: 1, filters: EMPTY_POKEMON_FILTERS };
   }
 
   protected showPokemon(index: number): void {
