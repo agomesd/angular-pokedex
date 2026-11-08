@@ -69,7 +69,21 @@
 
       <section class="flex flex-col gap-2">
         <div class="flex items-center justify-between gap-2">
-          <h3 class="font-medium">Base stats</h3>
+          <div class="flex items-center gap-1">
+            <h3 class="font-medium">Base stats</h3>
+            @if (against()) {
+              <button
+                type="button"
+                class="text-muted-foreground inline-flex size-4 cursor-pointer items-center justify-center rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                style="--ng-icon__size: 0.875rem"
+                brnTooltip="Green bars are higher. Red bars are lower."
+                position="bottom"
+                aria-label="Green bars are higher. Red bars are lower."
+              >
+                <ng-icon name="lucideInfo" />
+              </button>
+            }
+          </div>
           <span class="tabular-nums">
             @if (totalDelta(detail.pokemon); as delta) {
               <span
@@ -83,9 +97,6 @@
             Total {{ total(detail.pokemon) }}
           </span>
         </div>
-        @if (against()) {
-          <p class="text-muted-foreground text-xs">Green bars are higher. Red bars are lower.</p>
-        }
         <ul class="flex flex-col gap-2">
           @for (stat of detail.pokemon.stats; track stat.stat.name) {
             <li>

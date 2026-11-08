@@ -1,0 +1,42 @@
+<form class="flex flex-col gap-3" (submit)="submit(); $event.preventDefault()">
+  <div class="flex flex-col gap-1">
+    <label class="text-sm font-medium" [attr.for]="id() + '-nickname'">Nickname</label>
+    <input
+      [id]="id() + '-nickname'"
+      type="text"
+      class="border-input bg-background h-7 w-full rounded-md border px-2 text-xs outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      maxlength="12"
+      autocomplete="off"
+      [formControl]="form.controls.nickname"
+      [attr.aria-invalid]="nicknameError() ? true : null"
+      [attr.aria-describedby]="nicknameError() ? id() + '-nickname-error' : null"
+    />
+    @if (nicknameError(); as message) {
+      <p [id]="id() + '-nickname-error'" role="alert" class="text-destructive text-xs">{{ message }}</p>
+    }
+  </div>
+  @if (showRole()) {
+    <div class="flex flex-col gap-1">
+      <label class="text-sm font-medium" [attr.for]="id() + '-role'">Role</label>
+      <app-select
+        [controlId]="id() + '-role'"
+        [options]="roleOptions"
+        [value]="form.controls.role.value"
+        placeholder="Select a role"
+        [invalid]="!!roleError()"
+        [describedBy]="roleError() ? id() + '-role-error' : null"
+        (valueChange)="selectRole($event)"
+      />
+      @if (roleError(); as message) {
+        <p [id]="id() + '-role-error'" role="alert" class="text-destructive text-xs">{{ message }}</p>
+      }
+    </div>
+  }
+  @if (error(); as message) {
+    <p role="alert" class="text-destructive text-xs">{{ message }}</p>
+  }
+  <div hlmDialogFooter>
+    <button hlmBtn type="button" variant="outline" class="cursor-pointer" hlmDialogClose>Cancel</button>
+    <button hlmBtn type="submit" class="cursor-pointer">{{ submitLabel() }}</button>
+  </div>
+</form>

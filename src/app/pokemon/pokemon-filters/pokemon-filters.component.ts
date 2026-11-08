@@ -6,7 +6,6 @@ import { lucideFunnel } from '@ng-icons/lucide';
 import { BrnSheetContent } from '@spartan-ng/brain/sheet';
 import { BrnSwitch, BrnSwitchThumb } from '@spartan-ng/brain/switch';
 import { HlmButton } from '@spartan-ng/helm/button';
-import { HlmSelectImports } from '@spartan-ng/helm/select';
 import { HlmSheet, HlmSheetImports } from '@spartan-ng/helm/sheet';
 import { catchError, forkJoin, map, of } from 'rxjs';
 import { PokemonService } from '../pokemon.service';
@@ -23,6 +22,7 @@ import {
   type TeamFilter,
 } from '../utils/pokemon-filters';
 import { typeCheckedTrack } from '../utils/type-colour';
+import { Select } from '../select/select.component';
 
 @Component({
   selector: 'app-pokemon-filters',
@@ -31,8 +31,8 @@ import { typeCheckedTrack } from '../utils/type-colour';
     TitleCasePipe,
     NgIcon,
     HlmButton,
-    HlmSelectImports,
     HlmSheetImports,
+    Select,
     BrnSheetContent,
     BrnSwitch,
     BrnSwitchThumb,
@@ -58,10 +58,6 @@ export class PokemonFilters {
     { value: 'on-team', label: 'On team' },
     { value: 'not-on-team', label: 'Not on team' },
   ];
-  protected readonly legendaryLabel = (value: LegendaryFilter): string =>
-    this.legendaryOptions.find((option) => option.value === value)?.label ?? 'All';
-  protected readonly teamLabel = (value: TeamFilter): string =>
-    this.teamOptions.find((option) => option.value === value)?.label ?? 'All';
   protected readonly filtersActive = computed(() => selectionIsActive(this.selection()));
   protected readonly hasTypes = computed(() => this.selection().types.length > 0);
   protected readonly hasGenerations = computed(() => this.selection().generations.length > 0);
@@ -106,13 +102,13 @@ export class PokemonFilters {
     this.update({ generations });
   }
 
-  protected setLegendary(value: LegendaryFilter | null | undefined): void {
-    if (!value) return;
+  protected setLegendary(value: string): void {
+    if (!isLegendaryFilter(value)) return;
     this.update({ legendary: value });
   }
 
-  protected setTeam(value: TeamFilter | null | undefined): void {
-    if (!value) return;
+  protected setTeam(value: string): void {
+    if (!isTeamFilter(value)) return;
     this.update({ team: value });
   }
 
@@ -133,4 +129,12 @@ export class PokemonFilters {
     if (sameSelection(next, this.selection())) return;
     this.filtersChange.emit(next);
   }
+}
+
+function isLegendaryFilter(value: string): value is LegendaryFilter {
+  return value === 'all' || value === 'legendary' || value === 'not-legendary';
+}
+
+function isTeamFilter(value: string): value is TeamFilter {
+  return value === 'all' || value === 'on-team' || value === 'not-on-team';
 }

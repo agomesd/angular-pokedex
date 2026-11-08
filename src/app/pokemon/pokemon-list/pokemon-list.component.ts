@@ -9,7 +9,7 @@ import { PokemonItem } from '../pokemon-item/pokemon-item.component';
 import { PokemonPagination } from '../pokemon-pagination/pokemon-pagination.component';
 import { Pokemon, PokemonService, type PokemonListResponse } from '../pokemon.service';
 import { PokemonSearchComponent } from '../search/pokemon-search.component';
-import { PokemonListEntry } from '../utils/pokemon-directory';
+import { pokemonIdFromResourceUrl, PokemonListEntry } from '../utils/pokemon-directory';
 import { DEFAULT_POKEMON_PAGE_SIZE, listPageQuery, pageForListIndex } from '../utils/list-page';
 import {
   EMPTY_POKEMON_FILTERS,
@@ -47,6 +47,7 @@ export class PokemonList {
 
   readonly itemAction = input<'team' | 'select'>('team');
   readonly layout = input<'page' | 'panel'>('page');
+  readonly excludeId = input<number | null>(null);
   readonly pokemonSelected = output<Pokemon>();
 
   protected readonly page = signal(listPageQuery(this.route.snapshot.queryParamMap.get('page')));
@@ -125,9 +126,10 @@ export class PokemonList {
         selection: this.filters(),
         attempt: this.filterAttempt(),
         teamIds: this.team.members().map((member) => member.id),
+        excludeId: this.excludeId(),
       })),
     ).pipe(
-      switchMap(({ selection, teamIds }) => {
+      switchMap(({ selection, teamIds, excludeId }) => {
         if (!selectionIsActive(selection)) return of<FilteredDirectory>({ status: 'idle' });
         return combineLatest([
           this.pokemonService.directory().pipe(
@@ -148,6 +150,7 @@ export class PokemonList {
               selection,
               entries: directory.entries.filter(
                 (entry) =>
+                  entry.id !== excludeId &&
                   matchesFilter(catalog.catalog.byName.get(entry.name), selection) &&
                   matchesTeam(onTeam.has(entry.id), selection.team),
               ),
@@ -161,7 +164,7 @@ export class PokemonList {
 
   protected readonly view = computed((): PokemonListView => {
     const selection = this.filters();
-    if (!selectionIsActive(selection)) return unfilteredView(this.list());
+    if (!selectionIsActive(selection)) return unfilteredView(this.list(), this.excludeId());
 
     const filtered = this.filtered();
     if (filtered.status === 'error') return { status: 'error', results: [], hasNext: false, lastPage: null, empty: false };
@@ -180,11 +183,15 @@ export class PokemonList {
   });
 }
 
-function unfilteredView(data: PokemonListResponse | undefined): PokemonListView {
+function unfilteredView(data: PokemonListResponse | undefined, excludeId: number | null): PokemonListView {
   if (!data) return { status: 'loading', results: [], hasNext: false, lastPage: null, empty: false };
+  const results =
+    excludeId == null
+      ? data.results
+      : data.results.filter((result) => pokemonIdFromResourceUrl(result.url) !== excludeId);
   return {
     status: 'ready',
-    results: data.results,
+    results,
     hasNext: data.next != null,
     lastPage: Math.max(1, Math.ceil(data.count / DEFAULT_POKEMON_PAGE_SIZE)),
     empty: false,

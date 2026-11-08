@@ -1,0 +1,73 @@
+<div class="relative" style="--ng-icon__size: 0.875rem" (focusout)="onFocusOut($event)" (keydown)="onKeydown($event)">
+  @if (appearance() === 'icon') {
+    <button
+      [id]="controlId()"
+      type="button"
+      [class]="triggerClass()"
+      style="--ng-icon__size: 1rem"
+      [attr.aria-label]="ariaLabel()"
+      [attr.aria-expanded]="open()"
+      aria-haspopup="listbox"
+      [attr.aria-controls]="controlId() + '-list'"
+      [brnTooltip]="tooltip() ?? ''"
+      [tooltipDisabled]="tooltipDisabled()"
+      position="right"
+      (pointerdown)="onTriggerPointerDown($event)"
+      (pointerleave)="tooltipSuppressed.set(false)"
+      (click)="toggle()"
+    >
+      @if (selected()?.icon; as icon) {
+        <ng-icon [name]="icon" />
+      }
+    </button>
+  } @else {
+    <button
+      [id]="controlId()"
+      type="button"
+      [class]="triggerClass()"
+      [attr.aria-invalid]="invalid() ? true : null"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-expanded]="open()"
+      aria-haspopup="listbox"
+      [attr.aria-controls]="controlId() + '-list'"
+      (click)="toggle()"
+    >
+      @if (selected(); as selected) {
+        @if (selected.icon; as icon) {
+          <ng-icon [name]="icon" />
+        }
+        <span>{{ selected.label }}</span>
+      } @else {
+        <span class="text-muted-foreground">{{ placeholder() }}</span>
+      }
+      <ng-icon name="lucideChevronDown" class="ml-auto opacity-60" />
+    </button>
+  }
+  @if (open()) {
+    <ul
+      [id]="controlId() + '-list'"
+      role="listbox"
+      [class]="menuClass()"
+    >
+      @for (option of options(); track option.value; let index = $index) {
+        <li role="presentation">
+          <button
+            [id]="controlId() + '-option-' + index"
+            type="button"
+            role="option"
+            tabindex="-1"
+            class="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-xs hover:bg-accent focus:bg-accent"
+            [class.bg-accent]="index === activeIndex()"
+            [attr.aria-selected]="option.value === value()"
+            (click)="choose(option.value)"
+          >
+            @if (option.icon; as icon) {
+              <ng-icon [name]="icon" />
+            }
+            <span>{{ option.label }}</span>
+          </button>
+        </li>
+      }
+    </ul>
+  }
+</div>

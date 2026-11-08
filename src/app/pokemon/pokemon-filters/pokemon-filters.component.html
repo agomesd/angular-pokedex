@@ -23,35 +23,13 @@
         <div class="grid gap-4 sm:grid-cols-2">
           <div class="flex min-w-0 flex-col gap-1.5">
             <label class="text-sm font-medium" for="pokemon-filter-legendary">Legendary</label>
-            <hlm-select class="block w-full" [value]="selection().legendary" [itemToString]="legendaryLabel"
-              (valueChange)="setLegendary($event)">
-              <hlm-select-trigger buttonId="pokemon-filter-legendary" class="w-full data-[size=default]:h-9">
-                <hlm-select-value />
-              </hlm-select-trigger>
-              <ng-template hlmSelectPortal>
-                <hlm-select-content>
-                  @for (option of legendaryOptions; track option.value) {
-                  <hlm-select-item [value]="option.value">{{ option.label }}</hlm-select-item>
-                  }
-                </hlm-select-content>
-              </ng-template>
-            </hlm-select>
+            <app-select controlId="pokemon-filter-legendary" size="md" [options]="legendaryOptions"
+              [value]="selection().legendary" (valueChange)="setLegendary($event)" />
           </div>
           <div class="flex min-w-0 flex-col gap-1.5">
             <label class="text-sm font-medium" for="pokemon-filter-team">Team</label>
-            <hlm-select class="block w-full" [value]="selection().team" [itemToString]="teamLabel"
-              (valueChange)="setTeam($event)">
-              <hlm-select-trigger buttonId="pokemon-filter-team" class="w-full data-[size=default]:h-9">
-                <hlm-select-value />
-              </hlm-select-trigger>
-              <ng-template hlmSelectPortal>
-                <hlm-select-content>
-                  @for (option of teamOptions; track option.value) {
-                  <hlm-select-item [value]="option.value">{{ option.label }}</hlm-select-item>
-                  }
-                </hlm-select-content>
-              </ng-template>
-            </hlm-select>
+            <app-select controlId="pokemon-filter-team" size="md" [options]="teamOptions" [value]="selection().team"
+              (valueChange)="setTeam($event)" />
           </div>
         </div>
 

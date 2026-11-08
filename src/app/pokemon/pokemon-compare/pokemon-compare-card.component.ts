@@ -1,6 +1,9 @@
 import { TitleCasePipe } from '@angular/common';
 import { Component, effect, inject, input, output, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import { lucideInfo } from '@ng-icons/lucide';
+import { BrnTooltip, provideBrnTooltipDefaultOptions } from '@spartan-ng/brain/tooltip';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 import { PokemonSprite } from '../pokemon-sprite/pokemon-sprite.component';
@@ -35,7 +38,15 @@ type StatComparison = {
 @Component({
   selector: 'app-pokemon-compare-card',
   templateUrl: './pokemon-compare-card.component.html',
-  imports: [TitleCasePipe, RouterLink, HlmButton, PokemonSprite, PokemonTypeBadge],
+  imports: [TitleCasePipe, RouterLink, NgIcon, HlmButton, BrnTooltip, PokemonSprite, PokemonTypeBadge],
+  providers: [
+    provideIcons({ lucideInfo }),
+    provideBrnTooltipDefaultOptions({
+      tooltipContentClasses:
+        'bg-popover text-popover-foreground z-50 w-max max-w-xs rounded-md px-2 py-1.5 text-xs shadow-md ring-1 ring-foreground/10',
+      arrowClasses: () => 'hidden',
+    }),
+  ],
 })
 export class PokemonCompareCard {
   private readonly pokemonService = inject(PokemonService);

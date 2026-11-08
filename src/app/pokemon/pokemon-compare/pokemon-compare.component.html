@@ -4,9 +4,33 @@
     <div class="flex flex-wrap items-center justify-end gap-2">
       @if (comparedName() && member(); as member) {
         <button hlmBtn type="button" variant="outline" class="cursor-pointer" (click)="unselect()">Unselect</button>
-        <button hlmBtn type="button" class="cursor-pointer" [disabled]="!canSwap()" (click)="swap(member)">
-          Swap into team
-        </button>
+        @if (canSwap()) {
+          <hlm-dialog class="inline-flex" (stateChanged)="onSwapDialog($event)">
+            <button hlmBtn hlmDialogTrigger type="button" class="cursor-pointer">Swap into team</button>
+            <ng-template brnDialogContent>
+              <hlm-dialog-content>
+                @if (candidatePokemon(); as next) {
+                  <div hlmDialogHeader>
+                    <h2 hlmDialogTitle>Swap in {{ next.name | titlecase }}</h2>
+                    <p hlmDialogDescription>
+                      Give this Pokémon a nickname and a role. It will replace {{ member.nickname }}.
+                    </p>
+                  </div>
+                  <app-team-member-form
+                    [id]="'swap'"
+                    submitLabel="Swap into team"
+                    [nickname]="suggestedNickname(next.name)"
+                    [role]="member.role"
+                    [error]="swapError()"
+                    (submitted)="swap(member, $event)"
+                  />
+                }
+              </hlm-dialog-content>
+            </ng-template>
+          </hlm-dialog>
+        } @else {
+          <button hlmBtn type="button" class="cursor-pointer" disabled>Swap into team</button>
+        }
       }
       <a hlmBtn variant="outline" class="cursor-pointer" routerLink="/">Back to team</a>
     </div>
@@ -38,7 +62,12 @@
           @if (notice(); as message) {
             <p role="status" class="px-4 pt-4 text-sm">{{ message }}</p>
           }
-          <app-pokemon-list layout="panel" itemAction="select" (pokemonSelected)="choose($event)" />
+          <app-pokemon-list
+            layout="panel"
+            itemAction="select"
+            [excludeId]="member.id"
+            (pokemonSelected)="choose($event)"
+          />
         </div>
 
         @if (comparedName(); as name) {

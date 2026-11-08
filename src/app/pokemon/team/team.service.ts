@@ -27,7 +27,11 @@ export type TeamAddResult =
   | { ok: true }
   | { ok: false; reason: 'duplicate' | 'full' | 'nickname' | 'role' };
 
-export type TeamReplaceResult = { ok: true } | { ok: false; reason: 'missing' | 'duplicate' };
+export type TeamReplaceResult =
+  | { ok: true }
+  | { ok: false; reason: 'missing' | 'duplicate' | 'nickname' | 'role' };
+
+export type TeamNicknameResult = { ok: true } | { ok: false; reason: 'missing' | 'nickname' };
 
 const STORAGE_KEY = 'pokemon-team';
 
@@ -84,28 +88,50 @@ export class TeamService {
     this.save(next);
   }
 
+  setNickname(id: number, nickname: string): TeamNicknameResult {
+    const current = this.slots();
+    const index = current.findIndex((slot) => slot?.id === id);
+    const member = current[index];
+    if (!member) return { ok: false, reason: 'missing' };
+
+    const nextNickname = normalizeNickname(nickname);
+    if (!nextNickname) return { ok: false, reason: 'nickname' };
+    if (nextNickname === member.nickname) return { ok: true };
+
+    const next = current.slice();
+    next[index] = { ...member, nickname: nextNickname };
+    this.save(next);
+    return { ok: true };
+  }
+
   remove(id: number): void {
     const current = this.slots();
     if (!current.some((slot) => slot?.id === id)) return;
     this.save(current.map((slot) => (slot?.id === id ? null : slot)));
   }
 
-  replace(currentId: number, next: Pick<TeamMember, 'id' | 'name' | 'sprite'>): TeamReplaceResult {
+  replace(
+    currentId: number,
+    next: Pick<TeamMember, 'id' | 'name' | 'sprite' | 'nickname' | 'role'>,
+  ): TeamReplaceResult {
     const current = this.slots();
     const index = current.findIndex((slot) => slot?.id === currentId);
-    const member = current[index];
-    if (!member) return { ok: false, reason: 'missing' };
+    if (!current[index]) return { ok: false, reason: 'missing' };
     if (next.id !== currentId && current.some((slot) => slot?.id === next.id)) {
       return { ok: false, reason: 'duplicate' };
     }
+
+    const nickname = normalizeNickname(next.nickname);
+    if (!nickname) return { ok: false, reason: 'nickname' };
+    if (!isTeamRole(next.role)) return { ok: false, reason: 'role' };
 
     const slots = current.slice();
     slots[index] = {
       id: next.id,
       name: next.name,
       sprite: next.sprite,
-      nickname: nicknameFor(next.name),
-      role: member.role,
+      nickname,
+      role: next.role,
     };
     this.save(slots);
     return { ok: true };
@@ -203,7 +229,7 @@ function legacyNickname(name: string): string {
   return trimmed.length <= 12 ? trimmed : trimmed.slice(0, 12);
 }
 
-function nicknameFor(name: string): string {
+export function suggestedNickname(name: string): string {
   const candidates = [name, name.split('-')[0] ?? name];
   for (const candidate of candidates) {
     const titled = candidate.charAt(0).toUpperCase() + candidate.slice(1);

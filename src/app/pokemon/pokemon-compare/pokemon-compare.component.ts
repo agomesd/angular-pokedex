@@ -1,19 +1,31 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, computed, effect, inject, PLATFORM_ID, signal } from '@angular/core';
+import { isPlatformBrowser, TitleCasePipe } from '@angular/common';
+import { Component, computed, effect, inject, PLATFORM_ID, signal, viewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
+import { BrnDialogContent } from '@spartan-ng/brain/dialog';
 import { HlmButton } from '@spartan-ng/helm/button';
+import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { PokemonList } from '../pokemon-list/pokemon-list.component';
 import { Pokemon } from '../pokemon.service';
-import { TeamMember, TeamService } from '../team/team.service';
+import { TeamMemberForm, TeamMemberFormValue } from '../team/team-member-form/team-member-form.component';
+import { isTeamRole, suggestedNickname, TeamMember, TeamService } from '../team/team.service';
 import { latestFrontDefault } from '../utils/latest-front-default';
 import { PokemonCompareCard } from './pokemon-compare-card.component';
 
 @Component({
   selector: 'app-pokemon-compare',
   templateUrl: './pokemon-compare.component.html',
-  imports: [RouterLink, HlmButton, PokemonList, PokemonCompareCard],
+  imports: [
+    TitleCasePipe,
+    RouterLink,
+    HlmButton,
+    HlmDialogImports,
+    BrnDialogContent,
+    PokemonList,
+    PokemonCompareCard,
+    TeamMemberForm,
+  ],
 })
 export class PokemonCompare {
   private readonly route = inject(ActivatedRoute);
@@ -24,7 +36,11 @@ export class PokemonCompare {
   protected readonly hydrated = this.team.hydrated;
   protected readonly teamPokemon = signal<Pokemon | null>(null);
   protected readonly candidatePokemon = signal<Pokemon | null>(null);
+  private readonly swapDialog = viewChild(HlmDialog);
+
   protected readonly notice = signal<string | null>(null);
+  protected readonly swapError = signal<string | null>(null);
+  protected readonly suggestedNickname = suggestedNickname;
 
   private readonly routeId = toSignal(
     this.route.paramMap.pipe(map((params) => pokemonId(params.get('id')))),
@@ -87,24 +103,34 @@ export class PokemonCompare {
     });
   }
 
-  protected swap(member: TeamMember): void {
+  protected onSwapDialog(state: string): void {
+    if (state !== 'open') return;
+    this.swapError.set(null);
+  }
+
+  protected swap(member: TeamMember, value: TeamMemberFormValue): void {
     const next = this.candidatePokemon();
-    if (!next || !this.canSwap()) return;
+    if (!next || !this.canSwap() || !isTeamRole(value.role)) return;
 
     const result = this.team.replace(member.id, {
       id: next.id,
       name: next.name,
       sprite: latestFrontDefault(next.sprites.versions) ?? next.sprites.front_default,
+      nickname: value.nickname,
+      role: value.role,
     });
     if (!result.ok) {
-      this.notice.set(
+      this.swapError.set(
         result.reason === 'duplicate'
           ? 'That Pokémon is already on your team.'
-          : 'That Pokémon is no longer on your team.',
+          : result.reason === 'nickname' || result.reason === 'role'
+            ? 'Check the nickname and role, then try again.'
+            : 'That Pokémon is no longer on your team.',
       );
       return;
     }
 
+    this.swapDialog()?.close();
     this.notice.set(`${titleCase(next.name)} replaced ${member.nickname} on your team.`);
     if (!this.isBrowser) return;
     void this.router.navigate(['/compare', next.id], {

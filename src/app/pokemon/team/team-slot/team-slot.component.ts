@@ -1,9 +1,10 @@
 import { TitleCasePipe } from '@angular/common';
-import { Component, computed, effect, inject, input, output, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, output, signal, untracked, viewChild } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { lucideCross, lucideGitCompareArrows, lucideShield, lucideSword, lucideTrash2 } from '@ng-icons/lucide';
-import { BrnTooltip, provideBrnTooltipDefaultOptions } from '@spartan-ng/brain/tooltip';
+import { lucideGitCompareArrows, lucidePencil, lucideTrash2 } from '@ng-icons/lucide';
+import { BrnDialogContent } from '@spartan-ng/brain/dialog';
 import { HlmButton } from '@spartan-ng/helm/button';
+import { HlmDialog, HlmDialogImports } from '@spartan-ng/helm/dialog';
 import { RouterLink } from '@angular/router';
 import { catchError, forkJoin, of, switchMap } from 'rxjs';
 import { PokemonDetailSheet } from '../../pokemon-detail-sheet/pokemon-detail-sheet.component';
@@ -11,20 +12,27 @@ import { PokemonService, PokemonType } from '../../pokemon.service';
 import { PokemonSprite } from '../../pokemon-sprite/pokemon-sprite.component';
 import { PokemonTypeBadge } from '../../pokemon-type-badge/pokemon-type-badge.component';
 import { latestSymbolIcon } from '../../utils/latest-symbol-icon';
-import { TEAM_ROLE_ICON, TEAM_ROLES, TeamRole, TeamService, TeamSlot } from '../team.service';
+import { Select, SelectOption } from '../../select/select.component';
+import { TeamMemberForm, TeamMemberFormValue } from '../team-member-form/team-member-form.component';
+import { isTeamRole, TEAM_ROLE_ICON, TEAM_ROLES, TeamService, TeamSlot } from '../team.service';
 
 @Component({
   selector: 'li[appTeamSlot]',
   templateUrl: './team-slot.component.html',
-  imports: [TitleCasePipe, RouterLink, PokemonSprite, NgIcon, HlmButton, PokemonDetailSheet, BrnTooltip, PokemonTypeBadge],
-  providers: [
-    provideIcons({ lucideTrash2, lucideSword, lucideShield, lucideCross, lucideGitCompareArrows }),
-    provideBrnTooltipDefaultOptions({
-      tooltipContentClasses:
-        'bg-popover text-popover-foreground z-50 w-max max-w-40 rounded-md px-2 py-1.5 text-xs shadow-md ring-1 ring-foreground/10',
-      arrowClasses: () => 'hidden',
-    }),
+  imports: [
+    TitleCasePipe,
+    RouterLink,
+    PokemonSprite,
+    NgIcon,
+    HlmButton,
+    HlmDialogImports,
+    BrnDialogContent,
+    PokemonDetailSheet,
+    PokemonTypeBadge,
+    TeamMemberForm,
+    Select,
   ],
+  providers: [provideIcons({ lucideTrash2, lucideGitCompareArrows, lucidePencil })],
   host: {
     class:
       "relative aspect-square rounded-2xl bg-[url('/pokemon-landscap.jpg')] bg-cover bg-center",
@@ -63,45 +71,53 @@ export class TeamSlotComponent {
   readonly pointerCancelled = output<PointerEvent>();
   readonly reorderKey = output<KeyboardEvent>();
 
-  protected readonly roles = TEAM_ROLES;
-  protected readonly roleIcons = TEAM_ROLE_ICON;
+  private readonly nicknameDialog = viewChild(HlmDialog);
+  private readonly roleSelect = viewChild(Select);
+
+  protected readonly roleOptions: readonly SelectOption[] = TEAM_ROLES.map((role) => ({
+    value: role,
+    label: role,
+    icon: TEAM_ROLE_ICON[role],
+  }));
   protected readonly roleMenuOpen = signal(false);
-  protected readonly tooltipSuppressed = signal(false);
+  protected readonly nicknameSaveError = signal<string | null>(null);
 
   protected readonly emptyLabel = computed(() =>
     this.member() ? null : `Empty slot ${this.index() + 1}`,
   );
 
-  protected suppressTooltip(event: Event): void {
-    const button = event.currentTarget;
-    if (button instanceof HTMLElement) {
-      button.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true, pointerType: 'mouse' }));
-    }
-    this.tooltipSuppressed.set(true);
-  }
-
-  protected toggleRoleMenu(): void {
-    this.roleMenuOpen.update((open) => !open);
-  }
-
-  protected selectRole(role: TeamRole): void {
+  protected selectRole(role: string): void {
     const member = this.member();
-    if (member) this.team.setRole(member.id, role);
-    this.roleMenuOpen.set(false);
+    if (!member || !isTeamRole(role)) return;
+    this.team.setRole(member.id, role);
   }
 
-  protected onRoleFocusOut(event: FocusEvent): void {
-    const next = event.relatedTarget;
-    const current = event.currentTarget;
-    if (next instanceof Node && current instanceof Node && current.contains(next)) return;
-    this.roleMenuOpen.set(false);
+  protected onNicknameDialog(state: string): void {
+    if (state !== 'open') return;
+    this.nicknameSaveError.set(null);
+  }
+
+  protected saveNickname(value: TeamMemberFormValue): void {
+    const member = this.member();
+    if (!member) return;
+
+    const result = this.team.setNickname(member.id, value.nickname);
+    if (!result.ok) {
+      this.nicknameSaveError.set(
+        result.reason === 'nickname'
+          ? 'Nickname must be 3 to 12 characters.'
+          : 'This Pokémon is no longer on your team.',
+      );
+      return;
+    }
+    this.nicknameDialog()?.close();
   }
 
   constructor() {
     effect(() => {
       this.member()?.id;
       this.dragging();
-      this.roleMenuOpen.set(false);
+      untracked(() => this.roleSelect()?.closeMenu());
     });
 
     effect((onCleanup) => {
