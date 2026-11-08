@@ -2,7 +2,7 @@ import { Component, input, OnInit, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { HlmButton } from '@spartan-ng/helm/button';
 import { HlmDialogClose, HlmDialogFooter } from '@spartan-ng/helm/dialog';
-import { Select, SelectOption } from '../../select/select.component';
+import { Select, SelectOption } from '../../../components/select/select.component';
 import {
   isTeamRole,
   normalizeNickname,

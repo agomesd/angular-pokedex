@@ -8,7 +8,7 @@ import { PokemonFilters } from '../pokemon-filters/pokemon-filters.component';
 import { PokemonItem } from '../pokemon-item/pokemon-item.component';
 import { PokemonPagination } from '../pokemon-pagination/pokemon-pagination.component';
 import { Pokemon, PokemonService, type PokemonListResponse } from '../pokemon.service';
-import { PokemonSearchComponent } from '../search/pokemon-search.component';
+import { PokemonSearchComponent } from '../pokemon-search/pokemon-search.component';
 import { pokemonIdFromResourceUrl, PokemonListEntry } from '../utils/pokemon-directory';
 import { DEFAULT_POKEMON_PAGE_SIZE, listPageQuery, pageForListIndex } from '../utils/list-page';
 import {

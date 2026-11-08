@@ -23,7 +23,7 @@ import {
   type TeamFilter,
 } from '../utils/pokemon-filters';
 import { typeCheckedTrack } from '../utils/type-colour';
-import { Select } from '../select/select.component';
+import { Select } from '../../components/select/select.component';
 
 @Component({
   selector: 'app-pokemon-filters',

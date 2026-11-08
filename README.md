@@ -44,7 +44,7 @@ Tailwind is the styling language I already use. Classes sit next to the markup, 
 
 Dialogs, sheets, buttons, cards, and switches come from that kit. I reach for a Helm component when the interaction already exists there. I write a small component when the interaction is specific to this app.
 
-`app-select` is one of those. The role field, the filter menus, and the round role button on a team slot all need the same keyboard behaviour: a letter jumps to a matching option, the arrow keys open and move, and Escape closes the list without closing the dialog or sheet. Helm's select did not give me that, plus an icon trigger, from one component. The listbox lives in `src/app/pokemon/select` and every select in the app uses it.
+`app-select` is one of those. The role field, the filter menus, and the round role button on a team slot all need the same keyboard behaviour: a letter jumps to a matching option, the arrow keys open and move, and Escape closes the list without closing the dialog or sheet. Helm's select did not give me that, plus an icon trigger, from one component. The listbox lives in `src/app/components/select` and every select in the app uses it. Search stays in `src/app/pokemon/pokemon-search` because it looks up a Pokémon, not an arbitrary string.
 
 Layout classes stay on the parent. A component styles its own control. The toolbar, for example, places search, pagination, and filters. Those components do not position themselves on the page.
 

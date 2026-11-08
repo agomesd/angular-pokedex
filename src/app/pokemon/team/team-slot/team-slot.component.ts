@@ -12,7 +12,7 @@ import { PokemonService, PokemonType } from '../../pokemon.service';
 import { PokemonSprite } from '../../pokemon-sprite/pokemon-sprite.component';
 import { PokemonTypeBadge } from '../../pokemon-type-badge/pokemon-type-badge.component';
 import { latestSymbolIcon } from '../../utils/latest-symbol-icon';
-import { Select, SelectOption } from '../../select/select.component';
+import { Select, SelectOption } from '../../../components/select/select.component';
 import { TeamMemberForm, TeamMemberFormValue } from '../team-member-form/team-member-form.component';
 import { isTeamRole, TEAM_ROLE_ICON, TEAM_ROLES, TeamService, TeamSlot } from '../team.service';
 
